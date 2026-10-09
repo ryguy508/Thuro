@@ -36,6 +36,7 @@
 
 * { box-sizing: border-box; }
 body {
+  margin: 0;
   background: var(--bg); color: var(--fg);
   font-family: var(--font-body); font-size: 17px; line-height: 1.6;
 }
@@ -56,19 +57,36 @@ h1, h2, h3 { font-family: var(--font-display); text-transform: uppercase; line-h
 .hazard { height: 14px; background: repeating-linear-gradient(-45deg, var(--yellow) 0 14px, var(--stripe-dark) 14px 28px); }
 
 /* hero */
-.hero { padding-block: 48px 56px; }
-.hero .wrap { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center; }
-.hero h1 { font-size: clamp(3rem, 8vw, 5.6rem); font-weight: 900; }
+.hero { position: relative; color: #f4f2ec; background-color: #14120f; background-image: linear-gradient(90deg, rgba(14,13,12,.94) 0%, rgba(14,13,12,.78) 50%, rgba(14,13,12,.38) 100%), url(images/truck.jpg); background-position: center 40%; background-size: cover; background-repeat: no-repeat; }
+.hero .wrap { padding-block: 96px 0; }
+.hero-copy { max-width: 640px; }
+.hero .eyebrow { color: var(--yellow); }
+.hero h1 { font-size: clamp(3.2rem, 9vw, 6.6rem); font-weight: 900; }
 .hero h1 em { font-style: normal; background: var(--yellow); color: var(--on-yellow); padding-inline: 0.12em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
-.hero p.lead { font-size: 1.15rem; max-width: 34em; margin: 22px 0 28px; color: var(--muted); }
+.hero p.lead { font-size: 1.2rem; max-width: 34em; margin: 26px 0 32px; color: #d8d5cc; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; }
-.btn { display: inline-block; text-decoration: none; font-weight: 700; padding: 14px 22px; border: 2px solid var(--fg); font-variant-numeric: tabular-nums; }
+.btn { display: inline-block; text-decoration: none; font-weight: 700; padding: 15px 26px; border: 2px solid var(--fg); font-variant-numeric: tabular-nums; }
 .btn.primary { background: var(--yellow); border-color: var(--yellow); color: var(--on-yellow); }
 .btn.primary:hover { background: #ffc61f; border-color: #ffc61f; }
 .btn.ghost:hover { background: var(--fg); color: var(--bg); }
-.photo { margin: 0; min-width: 0; }
-.photo img { display: block; width: 100%; height: auto; border: 6px solid var(--surface); box-shadow: 0 0 0 2px var(--line); }
-.photo figcaption { font-size: 0.8rem; color: var(--muted); margin-top: 10px; }
+.hero .btn.ghost { border-color: #f4f2ec; color: #f4f2ec; }
+.hero .btn.ghost:hover { background: #f4f2ec; color: #14120f; }
+.facts { list-style: none; margin: 80px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(244,242,236,.28); }
+.facts li { padding: 20px 20px 24px 0; font-size: 0.95rem; color: #d8d5cc; }
+.facts li + li { padding-left: 20px; border-left: 1px solid rgba(244,242,236,.28); }
+.facts strong { display: block; font-family: var(--font-display); font-size: 1.6rem; text-transform: uppercase; letter-spacing: 0.02em; color: #fff; line-height: 1.1; margin-bottom: 4px; }
+
+/* about + process */
+.about { display: grid; grid-template-columns: 1fr 1.2fr; gap: 48px; align-items: start; }
+.about h2 { margin-bottom: 0; }
+.about p { margin: 0 0 16px; max-width: 38em; }
+.about p.big { font-size: 1.3rem; line-height: 1.45; font-weight: 500; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; counter-reset: s; border-top: 2px solid var(--fg); }
+.steps li { counter-increment: s; padding: 22px 20px 0 0; min-width: 0; }
+.steps li + li { padding-left: 20px; border-left: 1px solid var(--line); }
+.steps li::before { content: counter(s); font-family: var(--font-display); font-weight: 900; font-size: 2.6rem; line-height: 1; color: var(--yellow); display: block; margin-bottom: 8px; }
+.steps h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+.steps p { margin: 0; color: var(--muted); font-size: 0.95rem; }
 
 /* section scaffolding */
 section { padding-block: 64px; }
@@ -111,7 +129,13 @@ section h2 { font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 900; margin-bot
 footer { padding-block: 20px; font-size: 0.85rem; color: var(--muted); }
 
 @media (max-width: 760px) {
-  .hero .wrap, .services, .contact .wrap { grid-template-columns: 1fr; gap: 32px; }
+  .services, .contact .wrap, .about { grid-template-columns: 1fr; gap: 28px; }
+  .hero .wrap { padding-block: 56px 0; }
+  .facts { grid-template-columns: 1fr; margin-top: 48px; }
+  .facts li, .facts li + li { padding: 16px 0; border-left: 0; }
+  .facts li + li { border-top: 1px solid rgba(244,242,236,.28); }
+  .steps { grid-template-columns: 1fr 1fr; row-gap: 28px; }
+  .steps li:nth-child(odd) { padding-left: 0; border-left: 0; }
   section { padding-block: 48px; }
   .brand { font-size: 1.25rem; }
 }
@@ -133,22 +157,39 @@ footer { padding-block: 20px; font-size: 0.85rem; color: var(--muted); }
 <main>
   <div class="hero">
     <div class="wrap">
-      <div>
-        <p class="eyebrow">Residential and commercial · Sterling, Massachusetts</p>
+      <div class="hero-copy">
+        <p class="eyebrow">Excavating · Site work · Snow removal</p>
         <h1>When <em>good enough</em> isn't good enough.</h1>
-        <p class="lead">Excavating, site work and snow removal from a family company on Greenland Road. Big job or small one, call and talk to the people who will do the work.</p>
+        <p class="lead">Baldarelli And Sons is a family excavating company on Greenland Road in Sterling, Massachusetts. We dig, grade, haul and plow for homeowners and businesses, and we do the work the way we would want it done on our own property.</p>
         <div class="actions">
           <a class="btn primary" href="tel:+19784227872">Call 978-422-7872</a>
           <a class="btn ghost" href="#reviews">Read the reviews</a>
         </div>
       </div>
-      <figure class="photo">
-        <img src="images/truck.jpg" alt="Red Baldarelli dump truck parked on a dirt lot under trees" width="300" height="240">
-        <figcaption>One of our dump trucks, Sterling, MA.</figcaption>
-      </figure>
+      <ul class="facts">
+        <li><strong>Residential and commercial</strong>Homeowners, contractors and businesses</li>
+        <li><strong>Small jobs welcome</strong>Not every project needs a big crew</li>
+        <li><strong>Straight answers</strong>Call for an honest quote</li>
+      </ul>
     </div>
   </div>
   <div class="hazard" aria-hidden="true"></div>
+
+  <section id="about">
+    <div class="wrap">
+      <div class="about">
+        <div>
+          <p class="eyebrow">About us</p>
+          <h2>Local, family-run and hands-on</h2>
+        </div>
+        <div>
+          <p class="big">The people who quote your job are the people who show up to do it.</p>
+          <p>We run our own excavators and dump trucks out of Sterling, so there is no handoff to a stranger and no runaround when you call. Customers tell us the same thing again and again: we are organized, friendly and honest about what a job needs.</p>
+          <p>Whether it is a few hours of grading behind a house or a commercial lot that needs plowing every storm, we show up prepared and finish what we start. If the job is small, that is fine with us. Small jobs are welcome.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <section class="band" id="services">
     <div class="wrap">
@@ -158,25 +199,25 @@ footer { padding-block: 20px; font-size: 0.85rem; color: var(--muted); }
         <ul class="rows">
           <li>
             <h3>Excavating</h3>
-            <p>Digging, grading, trenching and site preparation with our own excavators and dump trucks.</p>
+            <p>Digging, grading, trenching, foundation holes, drainage and site preparation, done with our own excavators and dump trucks. We haul material in and out so you do not have to arrange a second company.</p>
           </li>
           <li>
             <h3>Septic and Title 5</h3>
-            <p>Excavation for septic system work. Call to talk through your property.</p>
+            <p>Excavation for septic system installation and repair, including work tied to Title 5 inspections. Call to talk through your property and what it needs.</p>
           </li>
           <li>
             <span class="season">Winter</span>
             <h3>Snow plowing and removal</h3>
-            <p>Residential and commercial lots and driveways cleared and hauled when needed.</p>
+            <p>Driveways, parking lots and business entrances cleared fast, residential and commercial. When snow piles up past what a plow can push, we remove it.</p>
           </li>
           <li>
             <span class="season">Winter</span>
             <h3>Sanding, salting and deicing</h3>
-            <p>Keep walkways and parking areas safe after the plow goes through.</p>
+            <p>Ice control for lots, walkways and driveways, so customers, employees and family can walk and drive safely after the plow goes through.</p>
           </li>
           <li>
             <h3>Small jobs welcome</h3>
-            <p>No job is too small to call about. Ask for a quote.</p>
+            <p>A single day of digging, a short driveway, a small lot. Call and tell us what you need.</p>
           </li>
         </ul>
         <figure class="adcard">
@@ -186,6 +227,18 @@ footer { padding-block: 20px; font-size: 0.85rem; color: var(--muted); }
     </div>
   </section>
 
+  <section id="process">
+    <div class="wrap">
+      <p class="eyebrow">How it works</p>
+      <h2>From phone call to finished job</h2>
+      <ol class="steps">
+        <li><h3>Call us</h3><p>Tell us what you need done and where the property is.</p></li>
+        <li><h3>We look at it</h3><p>We talk through the job and see what it will take.</p></li>
+        <li><h3>Straight quote</h3><p>You get a clear price and plan, with no surprises later.</p></li>
+        <li><h3>Done right</h3><p>We do the work, clean up and make sure you are happy.</p></li>
+      </ol>
+    </div>
+  </section>
   <div class="hazard" aria-hidden="true"></div>
   <section class="band" id="reviews">
     <div class="wrap">
@@ -228,7 +281,7 @@ footer { padding-block: 20px; font-size: 0.85rem; color: var(--muted); }
     <div class="wrap">
       <div>
         <h2>Get a quote</h2>
-        <p>Call and tell us about the job.</p>
+        <p>Tell us about the job and we will tell you what it will take. Serving Sterling and the surrounding towns. Ask us if you are not sure we cover your area.</p>
         <div class="bignum">978-422-7872</div>
         <a class="btn primary" href="tel:+19784227872">Call now</a>
       </div>
