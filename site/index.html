@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Baldarelli And Sons: excavating, site work and snow removal in Sterling, MA. Call 978-422-7872.">
+<title>Baldarelli And Sons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: signage-style one-pager. Sticky call bar, split hero (headline + truck photo), hazard-stripe dividers, service rows, photo strip, Google reviews, contact. */
+:root {
+  --bg: #efeee9;
+  --surface: #ffffff;
+  --fg: #1d1c1a;
+  --muted: #5d5a54;
+  --line: #d6d3ca;
+  --yellow: #f2b300;
+  --on-yellow: #1d1c1a;
+  --red: #a8231b;
+  --stripe-dark: #1d1c1a;
+  --font-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --font-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #151412; --surface: #201e1b; --fg: #f1efe9; --muted: #aaa69c; --line: #3a3732;
+    --red: #e0574d; --stripe-dark: #0c0b0a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #151412; --surface: #201e1b; --fg: #f1efe9; --muted: #aaa69c; --line: #3a3732;
+  --red: #e0574d; --stripe-dark: #0c0b0a; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.6;
+}
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+.wrap { max-width: 1080px; margin-inline: auto; padding-inline: 20px; }
+h1, h2, h3 { font-family: var(--font-display); text-transform: uppercase; line-height: 0.95; margin: 0; text-wrap: balance; letter-spacing: 0.01em; }
+.eyebrow { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+
+/* top bar */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: var(--stripe-dark); color: #f1efe9; }
+.bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 10px; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.03em; line-height: 1; }
+.brand small { display: block; font-family: var(--font-body); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.16em; color: var(--yellow); margin-top: 4px; }
+.call { background: var(--yellow); color: var(--on-yellow); text-decoration: none; font-weight: 700; padding: 10px 16px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.call:hover { background: #ffc61f; }
+
+.hazard { height: 14px; background: repeating-linear-gradient(-45deg, var(--yellow) 0 14px, var(--stripe-dark) 14px 28px); }
+
+/* hero */
+.hero { padding-block: 48px 56px; }
+.hero .wrap { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center; }
+.hero h1 { font-size: clamp(3rem, 8vw, 5.6rem); font-weight: 900; }
+.hero h1 em { font-style: normal; background: var(--yellow); color: var(--on-yellow); padding-inline: 0.12em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.hero p.lead { font-size: 1.15rem; max-width: 34em; margin: 22px 0 28px; color: var(--muted); }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn { display: inline-block; text-decoration: none; font-weight: 700; padding: 14px 22px; border: 2px solid var(--fg); font-variant-numeric: tabular-nums; }
+.btn.primary { background: var(--yellow); border-color: var(--yellow); color: var(--on-yellow); }
+.btn.primary:hover { background: #ffc61f; border-color: #ffc61f; }
+.btn.ghost:hover { background: var(--fg); color: var(--bg); }
+.photo { margin: 0; min-width: 0; }
+.photo img { display: block; width: 100%; height: auto; border: 6px solid var(--surface); box-shadow: 0 0 0 2px var(--line); }
+.photo figcaption { font-size: 0.8rem; color: var(--muted); margin-top: 10px; }
+
+/* section scaffolding */
+section { padding-block: 64px; }
+section h2 { font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 900; margin-bottom: 28px; }
+.band { background: var(--surface); border-block: 1px solid var(--line); }
+
+/* services */
+.services { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+.rows { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--fg); }
+.rows li { display: grid; grid-template-columns: 1fr; gap: 2px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+.rows h3 { font-size: 1.7rem; font-weight: 800; }
+.rows p { margin: 0; color: var(--muted); }
+.season { display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--on-yellow); background: var(--yellow); padding: 2px 8px; margin-bottom: 6px; justify-self: start; }
+.adcard { margin: 0; min-width: 0; }
+.adcard img { display: block; width: 100%; max-width: 420px; height: auto; border: 6px solid var(--bg); box-shadow: 0 0 0 2px var(--line); margin-inline: auto; }
+
+/* reviews */
+.score { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; margin-bottom: 32px; }
+.score .num { font-family: var(--font-display); font-weight: 900; font-size: 4.2rem; line-height: 0.9; }
+.stars { color: var(--yellow); font-size: 1.5rem; letter-spacing: 0.1em; line-height: 1; }
+.score p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+.reviews { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+.review { background: var(--bg); border: 1px solid var(--line); padding: 22px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.review blockquote { margin: 0; font-size: 1.02rem; }
+.review .who { margin-top: auto; display: flex; flex-direction: column; font-size: 0.88rem; color: var(--muted); }
+.review .who strong { color: var(--fg); font-size: 0.98rem; }
+.glink { display: inline-block; margin-top: 28px; font-weight: 700; }
+
+/* contact */
+.contact { background: var(--stripe-dark); color: #f1efe9; }
+.contact .wrap { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; }
+.contact h2 { color: var(--yellow); margin-bottom: 14px; }
+.contact p { margin: 0 0 8px; }
+.bignum { font-family: var(--font-display); font-weight: 900; font-size: clamp(2.6rem, 8vw, 4.2rem); line-height: 1; margin: 6px 0 18px; font-variant-numeric: tabular-nums; }
+.contact .btn { border-color: #f1efe9; color: #f1efe9; }
+.contact .btn:hover { background: #f1efe9; color: #1d1c1a; }
+.contact .btn.primary { color: var(--on-yellow); border-color: var(--yellow); }
+.addr { font-style: normal; line-height: 1.7; }
+.addr strong { display: block; font-size: 1.1rem; }
+footer { padding-block: 20px; font-size: 0.85rem; color: var(--muted); }
+
+@media (max-width: 760px) {
+  .hero .wrap, .services, .contact .wrap { grid-template-columns: 1fr; gap: 32px; }
+  section { padding-block: 48px; }
+  .brand { font-size: 1.25rem; }
+}
+@media (max-width: 420px) {
+  .bar .call span { display: none; }
+}
+</style>
+
+</head>
+<body>
+<header class="bar">
+  <div class="wrap">
+    <div class="brand">Baldarelli &amp; Sons<small>Excavating · Sterling, MA</small></div>
+    <a class="call" href="tel:+19784227872"><span>Call </span>978-422-7872</a>
+  </div>
+</header>
+<div class="hazard" aria-hidden="true"></div>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">Residential and commercial · Sterling, Massachusetts</p>
+        <h1>When <em>good enough</em> isn't good enough.</h1>
+        <p class="lead">Excavating, site work and snow removal from a family company on Greenland Road. Big job or small one, call and talk to the people who will do the work.</p>
+        <div class="actions">
+          <a class="btn primary" href="tel:+19784227872">Call 978-422-7872</a>
+          <a class="btn ghost" href="#reviews">Read the reviews</a>
+        </div>
+      </div>
+      <figure class="photo">
+        <img src="images/truck.jpg" alt="Red Baldarelli dump truck parked on a dirt lot under trees" width="300" height="240">
+        <figcaption>One of our dump trucks, Sterling, MA.</figcaption>
+      </figure>
+    </div>
+  </div>
+  <div class="hazard" aria-hidden="true"></div>
+
+  <section class="band" id="services">
+    <div class="wrap">
+      <p class="eyebrow">What we do</p>
+      <h2>Services</h2>
+      <div class="services">
+        <ul class="rows">
+          <li>
+            <h3>Excavating</h3>
+            <p>Digging, grading, trenching and site preparation with our own excavators and dump trucks.</p>
+          </li>
+          <li>
+            <h3>Septic and Title 5</h3>
+            <p>Excavation for septic system work. Call to talk through your property.</p>
+          </li>
+          <li>
+            <span class="season">Winter</span>
+            <h3>Snow plowing and removal</h3>
+            <p>Residential and commercial lots and driveways cleared and hauled when needed.</p>
+          </li>
+          <li>
+            <span class="season">Winter</span>
+            <h3>Sanding, salting and deicing</h3>
+            <p>Keep walkways and parking areas safe after the plow goes through.</p>
+          </li>
+          <li>
+            <h3>Small jobs welcome</h3>
+            <p>No job is too small to call about. Ask for a quote.</p>
+          </li>
+        </ul>
+        <figure class="adcard">
+          <img src="images/ad.jpg" alt="Baldarelli and Sons advertisement showing a Volvo excavator, offering snow plowing, sanding, salting, deicing and snow removal" width="348" height="348">
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <div class="hazard" aria-hidden="true"></div>
+  <section class="band" id="reviews">
+    <div class="wrap">
+      <p class="eyebrow">Google reviews</p>
+      <h2>What customers say</h2>
+      <div class="score">
+        <span class="num">5.0</span>
+        <div>
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <p>6 reviews on Google</p>
+        </div>
+      </div>
+      <div class="reviews">
+        <article class="review">
+          <blockquote>“Very organized place, and everyone is always extremely helpful and welcoming. The team is friendly, professional, and always ready to assist with a great attitude. I highly recommend them 100%!”</blockquote>
+          <div class="who"><strong>Rafael Pagani</strong>Local Guide · 4 months ago</div>
+        </article>
+        <article class="review">
+          <blockquote>“When good enough isn't good enough give Jason a call. He will get it done right!”</blockquote>
+          <div class="who"><strong>Kelly Baldarelli</strong>2 years ago</div>
+        </article>
+        <article class="review">
+          <blockquote>“Great guys. Very straightforward and honest. Give em a shout for a quote.”</blockquote>
+          <div class="who"><strong>Bud Wilbur</strong>Local Guide · 4 years ago</div>
+        </article>
+        <article class="review">
+          <blockquote>“What an amazing place can't wait to go back amazing customer service just overall great!!!”</blockquote>
+          <div class="who"><strong>Pedro Villegas</strong>5 years ago</div>
+        </article>
+        <article class="review">
+          <blockquote>“Cool”</blockquote>
+          <div class="who"><strong>James Jacqueson</strong>6 years ago</div>
+        </article>
+      </div>
+      <a class="glink" href="https://www.google.com/maps/search/?api=1&amp;query=Baldarelli+And+Sons+57+Greenland+Rd+Sterling+MA+01564" target="_blank" rel="noopener">See all reviews on Google →</a>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <div>
+        <h2>Get a quote</h2>
+        <p>Call and tell us about the job.</p>
+        <div class="bignum">978-422-7872</div>
+        <a class="btn primary" href="tel:+19784227872">Call now</a>
+      </div>
+      <address class="addr">
+        <strong>Baldarelli And Sons</strong>
+        57 Greenland Rd<br>
+        Sterling, MA 01564<br><br>
+        <a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=Baldarelli+And+Sons+57+Greenland+Rd+Sterling+MA+01564" target="_blank" rel="noopener">Get directions</a>
+      </address>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">© Baldarelli And Sons · Sterling, Massachusetts</div>
+</footer>
+
+</body>
+</html>
