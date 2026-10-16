@@ -1,0 +1,18 @@
+---
+const steps = [
+  { title: 'Inspect & Identify', text: 'We look over your home and yard, find what is causing the problem, and identify the pests involved.' },
+  { title: 'Treat the Problem', text: 'Targeted treatments go where pests actually live and travel, including nests, trails, and hiding spots.' },
+  { title: 'Protect the Perimeter', text: 'We treat entry points and the exterior of your home to build a barrier that keeps pests out.' },
+  { title: 'Review & Report', text: 'You get a clear summary of what we did and simple tips to help keep pests away between visits.' },
+  { title: 'Free Re-Treatment', text: 'If pests return between visits, we come back and re-treat at no charge.' },
+];
+---
+
+<ol class="steps">
+  {steps.map((s) => (
+    <li class="step">
+      <h3>{s.title}</h3>
+      <p>{s.text}</p>
+    </li>
+  ))}
+</ol>

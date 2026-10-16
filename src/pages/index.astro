@@ -1,0 +1,201 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import EstimateCard from '../components/EstimateCard.astro';
+import Steps from '../components/Steps.astro';
+import { site } from '../data/site';
+import { pests, addOnPests } from '../data/pests';
+import { towns } from '../data/towns';
+import { faqs } from '../data/faqs';
+import { u } from '../lib/url';
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const planIncludes = [
+  'Ants, including fire ants and carpenter ants',
+  'Roaches and palmetto bugs',
+  'Spiders, webs, and egg sacs',
+  'Silverfish, earwigs, and crickets',
+  'Accessible wasp and hornet nests',
+  'Perimeter and entry-point protection',
+  'Service report after every visit',
+  'Free re-treatment between visits',
+];
+---
+
+<Base
+  title="Thuro Pest Control | Myrtle Beach & Horry County, SC"
+  description="Family- and pet-friendly pest control in Myrtle Beach, Conway, and Horry County. Quarterly protection plans, one-time treatments, and free re-treatment between visits. Get a free estimate."
+  jsonLd={[faqLd]}
+>
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <span class="eyebrow">Thuro Pest Control &middot; Myrtle Beach &amp; Horry County</span>
+        <h1>Pests out. <em>Peace of mind</em> in.</h1>
+        <p class="lede">
+          Reliable year-round protection for your home, backed by a simple promise: if pests come
+          back between visits, we re-treat for free.
+        </p>
+        <ul class="hero-points">
+          <li><Icon name="check" size={20} /> Licensed &amp; insured in South Carolina</li>
+          <li><Icon name="check" size={20} /> Family- and pet-friendly treatments</li>
+          <li><Icon name="check" size={20} /> Quarterly plans or one-time service</li>
+        </ul>
+        <div class="hero-cta">
+          <a class="btn btn-gold" href={site.phoneHref}><Icon name="phone" size={18} /> Call {site.phone}</a>
+          <a class="btn btn-outline" href="#plans">See Our Plans</a>
+        </div>
+      </div>
+      <EstimateCard />
+    </div>
+  </section>
+
+  <section class="trust" aria-label="Why homeowners choose Thuro">
+    <div class="container trust-grid">
+      <div class="trust-item"><Icon name="shield-check" size={28} /> Licensed &amp; insured in SC</div>
+      <div class="trust-item"><Icon name="spray-can" size={28} /> Family- &amp; pet-friendly treatments</div>
+      <div class="trust-item"><Icon name="badge-check" size={28} /> Free re-treatment between visits</div>
+      <div class="trust-item"><Icon name="map-pin" size={28} /> Local team, Conway SC</div>
+    </div>
+  </section>
+
+  <section class="section" id="how-it-works">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">How It Works</span>
+        <h2>Our Thuro service, step by step</h2>
+        <p class="lede">Every visit follows the same thorough routine, so you always know what to expect.</p>
+      </div>
+      <Steps />
+    </div>
+  </section>
+
+  <section class="section section-alt" id="pests">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Pests We Treat</span>
+        <h2>Protection for the pests that matter here</h2>
+        <p class="lede">The Grand Strand's warm, humid climate keeps pests busy. Here is what we handle.</p>
+      </div>
+      <div class="card-grid">
+        {pests.map((p) => (
+          <a class="card" href={u(`pests/${p.slug}/`)}>
+            <span class="card-icon"><Icon name={p.icon} size={26} /></span>
+            <span class={`tag ${p.inPlan ? 'tag-plan' : ''}`}>{p.inPlan ? 'In quarterly plan' : 'Add-on service'}</span>
+            <h3>{p.name}</h3>
+            <p>{p.short}</p>
+            <span class="card-more">Learn more <Icon name="arrow-right" size={16} /></span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="plans">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Plans</span>
+        <h2>Protection that fits how you live</h2>
+        <p class="lede">Choose ongoing protection or a one-time fix. Every price starts with a free estimate.</p>
+      </div>
+      <div class="plans">
+        <article class="plan plan-featured">
+          <span class="plan-badge">Most Popular</span>
+          <h3>Quarterly Protection Plan</h3>
+          <p>Four visits a year keep a barrier around your home through every season, so problems stop before they start.</p>
+          <ul class="checklist checklist-cols">
+            {planIncludes.map((item) => <li><Icon name="check" size={18} /> {item}</li>)}
+          </ul>
+          <a class="btn btn-gold" href="#estimate">Get My Free Estimate</a>
+          <div class="addons">
+            <h4>Add-ons available</h4>
+            <div class="addon-links">
+              {addOnPests.map((p) => <a class="pill" href={u(`pests/${p.slug}/`)}>{p.name}</a>)}
+            </div>
+          </div>
+        </article>
+
+        <article class="plan">
+          <h3>One-Time Service</h3>
+          <p>Dealing with a specific problem right now? A targeted treatment gets it under control.</p>
+          <ul class="checklist">
+            <li><Icon name="check" size={18} /> Inspection to find the source</li>
+            <li><Icon name="check" size={18} /> Treatment matched to the pest</li>
+            <li><Icon name="check" size={18} /> Prevention tips to keep them gone</li>
+            <li><Icon name="check" size={18} /> Easy upgrade to a quarterly plan</li>
+          </ul>
+          <a class="btn btn-dark" href="#estimate">Request One-Time Service</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 0;">
+    <div class="container">
+      <div class="guarantee">
+        <div class="seal"><Icon name="badge-check" size={42} /></div>
+        <div>
+          <h2>Pests come back? So do we. Free.</h2>
+          <p>
+            If pests return between scheduled visits, call us and we will re-treat at no additional
+            cost. No hassle, no hidden fees.
+          </p>
+        </div>
+        <a class="btn btn-gold" href={site.phoneHref}>Call {site.phone}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="areas">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Service Areas</span>
+        <h2>Proudly serving Horry County</h2>
+        <p class="lede">From Little River to Pawleys Island, we protect homes across the Grand Strand.</p>
+      </div>
+      <div class="area-grid">
+        {towns.map((t) => (
+          <a class="area" href={u(`locations/${t.slug}/`)}><Icon name="map-pin" size={18} /> {t.name}</a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">FAQ</span>
+        <h2>Questions, answered</h2>
+      </div>
+      <div class="faq">
+        {faqs.map((f) => (
+          <details>
+            <summary>{f.q} <Icon name="chevron-down" size={20} /></summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-dark cta-band">
+    <div class="container">
+      <span class="eyebrow">Ready when you are</span>
+      <h2>Get your free estimate today</h2>
+      <p class="lede">Tell us about your home and we will take it from there. No obligation.</p>
+      <div class="cta-actions">
+        <a class="btn btn-gold" href="#estimate">Get My Free Estimate</a>
+        <a class="btn btn-outline" href={site.phoneHref}><Icon name="phone" size={18} /> {site.phone}</a>
+      </div>
+    </div>
+  </section>
+</Base>

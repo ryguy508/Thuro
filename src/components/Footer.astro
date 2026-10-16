@@ -1,0 +1,45 @@
+---
+import { site } from '../data/site';
+import { pests } from '../data/pests';
+import { towns } from '../data/towns';
+import { u } from '../lib/url';
+---
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <a href={u()} class="wordmark wordmark-light" aria-label="Thuro Pest Control home">
+        <span class="wordmark-main">THURO</span>
+        <span class="wordmark-sub">Pest Control</span>
+      </a>
+      <p class="footer-about">
+        Reliable, family- and pet-friendly pest protection for homes in {site.region}.
+        A <a href={site.mainSite}>Thuro Exteriors</a> company.
+      </p>
+      <p class="footer-contact">
+        <a href={site.phoneHref}>{site.phone}</a>
+      </p>
+      {site.licenseNumber && <p class="footer-license">SC Pest Control License #{site.licenseNumber}</p>}
+      <p class="footer-license">Licensed &amp; insured in South Carolina</p>
+    </div>
+
+    <div>
+      <h3>Pests We Treat</h3>
+      <ul>
+        {pests.map((p) => <li><a href={u(`pests/${p.slug}/`)}>{p.name}</a></li>)}
+      </ul>
+    </div>
+
+    <div>
+      <h3>Service Areas</h3>
+      <ul class="two-col">
+        {towns.map((t) => <li><a href={u(`locations/${t.slug}/`)}>{t.name}</a></li>)}
+      </ul>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <span>&copy; {new Date().getFullYear()} Thuro Exteriors. All rights reserved.</span>
+    <a href={site.mainSite}>thuroexteriors.com</a>
+  </div>
+</footer>

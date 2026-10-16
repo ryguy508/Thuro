@@ -1,0 +1,166 @@
+---
+import Icon from './Icon.astro';
+import { serviceZips, site } from '../data/site';
+import { pests } from '../data/pests';
+
+interface Props {
+  id?: string;
+  heading?: string;
+  /** Pre-selects a pest in the form, used on pest pages. */
+  pest?: string;
+}
+
+const { id = 'estimate', heading = 'Free Cost Estimate', pest = '' } = Astro.props;
+const endpoint = import.meta.env.PUBLIC_LEAD_ENDPOINT ?? '';
+---
+
+<div class="estimate" id={id} data-estimate data-zips={JSON.stringify(serviceZips)} data-endpoint={endpoint}>
+  <h2 class="estimate-title">{heading}</h2>
+
+  <form class="est-zip" novalidate>
+    <label for={`${id}-zip`}>ZIP Code</label>
+    <div class="zip-field">
+      <Icon name="map-pin" size={20} />
+      <input id={`${id}-zip`} name="zip" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="Enter your ZIP code" />
+    </div>
+    <button class="btn btn-gold btn-block" type="submit">Get Your Estimate</button>
+    <p class="est-note">Takes under 2 minutes. No obligation.</p>
+  </form>
+
+  <p class="est-msg" role="status" aria-live="polite" hidden></p>
+
+  <form class="est-lead" novalidate hidden>
+    <input type="hidden" name="zip" />
+    <div class="field">
+      <label for={`${id}-name`}>Full name</label>
+      <input id={`${id}-name`} name="name" autocomplete="name" required />
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for={`${id}-phone`}>Phone</label>
+        <input id={`${id}-phone`} name="phone" type="tel" autocomplete="tel" required />
+      </div>
+      <div class="field">
+        <label for={`${id}-email`}>Email</label>
+        <input id={`${id}-email`} name="email" type="email" autocomplete="email" required />
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for={`${id}-pest`}>What are you seeing?</label>
+        <select id={`${id}-pest`} name="pest">
+          <option value="">Not sure / general protection</option>
+          {pests.map((p) => <option value={p.name} selected={p.slug === pest}>{p.name}</option>)}
+        </select>
+      </div>
+      <div class="field">
+        <label for={`${id}-service`}>Service type</label>
+        <select id={`${id}-service`} name="service">
+          <option value="Not sure">Not sure yet</option>
+          <option value="Quarterly plan">Quarterly protection plan</option>
+          <option value="One-time">One-time service</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label for={`${id}-notes`}>Anything we should know? <span class="optional">(optional)</span></label>
+      <textarea id={`${id}-notes`} name="notes" rows="2"></textarea>
+    </div>
+    <!-- Honeypot: real visitors never see or fill this. -->
+    <div class="hp" aria-hidden="true">
+      <label>Website <input name="website" tabindex="-1" autocomplete="off" /></label>
+    </div>
+    <button class="btn btn-gold btn-block" type="submit">Request My Free Estimate</button>
+    <p class="est-error" role="alert" hidden></p>
+  </form>
+
+  <div class="est-done" hidden>
+    <Icon name="badge-check" size={40} />
+    <h3>Request received</h3>
+    <p>Thanks! A Thuro team member will reach out shortly with your free estimate. Need it sooner? Call <a href={site.phoneHref}>{site.phone}</a>.</p>
+  </div>
+</div>
+
+<script>
+  type LeadPayload = Record<string, string>;
+
+  function setText(el: HTMLElement | null, text: string) {
+    if (!el) return;
+    el.textContent = text;
+    el.hidden = !text;
+  }
+
+  async function submitLead(endpoint: string, payload: LeadPayload) {
+    if (!endpoint) {
+      // Without an endpoint, only pretend to succeed while developing. In production, fail loudly.
+      if (import.meta.env.DEV) {
+        console.info('[dev] Estimate request (no endpoint configured):', payload);
+        return;
+      }
+      throw new Error('not-configured');
+    }
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error('request-failed');
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-estimate]').forEach((root) => {
+    const zips: string[] = JSON.parse(root.dataset.zips ?? '[]');
+    const endpoint = root.dataset.endpoint ?? '';
+    const zipForm = root.querySelector<HTMLFormElement>('.est-zip')!;
+    const leadForm = root.querySelector<HTMLFormElement>('.est-lead')!;
+    const msg = root.querySelector<HTMLElement>('.est-msg');
+    const done = root.querySelector<HTMLElement>('.est-done')!;
+    const errorEl = root.querySelector<HTMLElement>('.est-error');
+
+    zipForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const zip = (new FormData(zipForm).get('zip') as string).trim();
+      if (!/^\d{5}$/.test(zip)) {
+        setText(msg, 'Please enter a 5-digit ZIP code.');
+        msg?.classList.add('is-error');
+        return;
+      }
+      msg?.classList.remove('is-error');
+      if (!zips.includes(zip)) {
+        msg?.classList.add('is-error');
+        setText(msg, `We don't serve ${zip} yet. Call us and we'll see what we can do.`);
+        return;
+      }
+      setText(msg, `Good news, we serve ${zip}! Tell us a little about your home.`);
+      (leadForm.elements.namedItem('zip') as HTMLInputElement).value = zip;
+      zipForm.hidden = true;
+      leadForm.hidden = false;
+    });
+
+    leadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setText(errorEl, '');
+      const data = Object.fromEntries(new FormData(leadForm)) as LeadPayload;
+      if (data.website) return; // honeypot tripped
+      if (!data.name?.trim() || !data.phone?.trim() || !/^\S+@\S+\.\S+$/.test(data.email ?? '')) {
+        setText(errorEl, 'Please add your name, phone number, and a valid email.');
+        return;
+      }
+      const button = leadForm.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+      button.disabled = true;
+      try {
+        await submitLead(endpoint, {
+          ...data,
+          source: 'thuro-pest-control',
+          page: location.pathname,
+          submittedAt: new Date().toISOString(),
+        });
+        leadForm.hidden = true;
+        msg!.hidden = true;
+        done.hidden = false;
+      } catch {
+        setText(errorEl, 'Sorry, we could not send that. Please call us at (978) 608-3019.');
+        button.disabled = false;
+      }
+    });
+  });
+</script>

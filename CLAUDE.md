@@ -26,10 +26,11 @@
 
 *This section should be updated with project-specific information as the codebase develops.*
 
-**Project Type**: [To be determined - web app, CLI tool, library, etc.]
-**Primary Language**: [To be determined]
-**Framework**: [To be determined]
-**Target Platform**: [To be determined]
+**Project Type**: Marketing site, estimate/checkout flow, and later a customer portal for Thuro Pest Control
+**Primary Language**: TypeScript
+**Framework**: Astro (static), served under `/pest-control` on thuroexteriors.com
+**Target Platform**: Web (Cloudflare Pages); GoHighLevel is the backend for leads, payments, and customers
+**Brand**: near-black `#101010` and gold `#af995b`; Playfair Display + Montserrat. See README.md for layout and launch checklist.
 
 ### Key Objectives
 

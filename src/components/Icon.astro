@@ -1,0 +1,50 @@
+---
+import arrowRight from 'lucide-static/icons/arrow-right.svg?raw';
+import badgeCheck from 'lucide-static/icons/badge-check.svg?raw';
+import bug from 'lucide-static/icons/bug.svg?raw';
+import calendarCheck from 'lucide-static/icons/calendar-check.svg?raw';
+import check from 'lucide-static/icons/check.svg?raw';
+import chevronDown from 'lucide-static/icons/chevron-down.svg?raw';
+import clipboardCheck from 'lucide-static/icons/clipboard-check.svg?raw';
+import droplets from 'lucide-static/icons/droplets.svg?raw';
+import heartHandshake from 'lucide-static/icons/heart-handshake.svg?raw';
+import house from 'lucide-static/icons/house.svg?raw';
+import leaf from 'lucide-static/icons/leaf.svg?raw';
+import mapPin from 'lucide-static/icons/map-pin.svg?raw';
+import pawPrint from 'lucide-static/icons/paw-print.svg?raw';
+import phone from 'lucide-static/icons/phone.svg?raw';
+import rat from 'lucide-static/icons/rat.svg?raw';
+import search from 'lucide-static/icons/search.svg?raw';
+import shieldCheck from 'lucide-static/icons/shield-check.svg?raw';
+import sprayCan from 'lucide-static/icons/spray-can.svg?raw';
+import worm from 'lucide-static/icons/worm.svg?raw';
+
+const icons: Record<string, string> = {
+  'arrow-right': arrowRight,
+  'badge-check': badgeCheck,
+  bug,
+  'calendar-check': calendarCheck,
+  check,
+  'chevron-down': chevronDown,
+  'clipboard-check': clipboardCheck,
+  droplets,
+  'heart-handshake': heartHandshake,
+  house,
+  leaf,
+  'map-pin': mapPin,
+  'paw-print': pawPrint,
+  phone,
+  rat,
+  search,
+  'shield-check': shieldCheck,
+  'spray-can': sprayCan,
+  worm,
+};
+
+const { name, size = 24 } = Astro.props;
+const svg = (icons[name] ?? icons.bug)
+  .replace(/ (width|height)="[^"]*"/g, '')
+  .replace('<svg', `<svg width="${size}" height="${size}" aria-hidden="true" focusable="false"`);
+---
+
+<Fragment set:html={svg} />

@@ -1,0 +1,85 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import EstimateCard from '../../components/EstimateCard.astro';
+import { pests } from '../../data/pests';
+import { site } from '../../data/site';
+import { u } from '../../lib/url';
+
+export function getStaticPaths() {
+  return pests.map((pest) => ({ params: { slug: pest.slug }, props: { pest } }));
+}
+
+const { pest } = Astro.props;
+const related = pests.filter((p) => p.slug !== pest.slug).slice(0, 4);
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Pest Control', item: new URL(u(), site.url).href },
+    { '@type': 'ListItem', position: 2, name: pest.name, item: new URL(u(`pests/${pest.slug}/`), site.url).href },
+  ],
+};
+---
+
+<Base
+  title={`${pest.name} Control in Myrtle Beach & Horry County, SC | Thuro Pest Control`}
+  description={`${pest.short} Thuro Pest Control treats ${pest.name.toLowerCase()} across Myrtle Beach, Conway, and Horry County. Free estimates.`}
+  path={`pests/${pest.slug}/`}
+  jsonLd={[breadcrumbLd]}
+>
+  <section class="hero hero-sm">
+    <div class="container">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href={u()}>Pest Control</a> / <span>{pest.name}</span>
+      </nav>
+      <span class="eyebrow">{pest.inPlan ? 'Included in our quarterly plan' : 'Add-on service'}</span>
+      <h1>{pest.name} Control in Myrtle Beach &amp; Horry County</h1>
+      <p class="lede">{pest.short}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container detail-grid">
+      <article class="prose">
+        <p class="lede">{pest.intro}</p>
+
+        <h2>Signs you may have a problem</h2>
+        <ul class="checklist">
+          {pest.signs.map((s) => <li><Icon name="search" size={18} /> {s}</li>)}
+        </ul>
+
+        <h2>How Thuro handles it</h2>
+        <ul class="checklist">
+          {pest.approach.map((s) => <li><Icon name="check" size={18} /> {s}</li>)}
+        </ul>
+
+        {pest.inPlan ? (
+          <div class="callout">
+            <p><strong>Included in the quarterly plan.</strong> Every scheduled visit covers {pest.name.toLowerCase()}, and if they return between visits we re-treat for free.</p>
+          </div>
+        ) : (
+          <div class="callout callout-gold">
+            <p><strong>Available as an add-on or stand-alone service.</strong> We will recommend the right option after a quick inspection, and quote it with your free estimate.</p>
+          </div>
+        )}
+
+        <h2>What you can do to help</h2>
+        <ul class="checklist">
+          {pest.tips.map((s) => <li><Icon name="leaf" size={18} /> {s}</li>)}
+        </ul>
+
+        <h2>More pests we treat</h2>
+        <div class="addon-links">
+          {related.map((p) => <a class="pill" href={u(`pests/${p.slug}/`)}>{p.name}</a>)}
+        </div>
+      </article>
+
+      <aside class="sticky">
+        <EstimateCard pest={pest.slug} heading={`Free ${pest.name} Estimate`} />
+        <p class="est-note" style="margin-top:14px;">Prefer to talk? Call <a href={site.phoneHref}><strong>{site.phone}</strong></a></p>
+      </aside>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,65 @@
+---
+import '@fontsource-variable/montserrat';
+import '@fontsource-variable/playfair-display';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site, serviceZips } from '../data/site';
+import { towns } from '../data/towns';
+import { u } from '../lib/url';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Path under the base, e.g. "pests/ants/". Empty string is the home page. */
+  path?: string;
+  /** Extra JSON-LD objects (FAQ, breadcrumbs, ...). */
+  jsonLd?: object[];
+}
+
+const { title, description, path = '', jsonLd = [] } = Astro.props;
+const canonical = new URL(u(path), site.url).href;
+
+const business = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: site.name,
+  url: new URL(u(), site.url).href,
+  telephone: '+1-978-608-3019',
+  description: 'Residential pest control, quarterly protection plans, and one-time treatments.',
+  areaServed: towns.map((t) => ({ '@type': 'City', name: `${t.name}, SC` })),
+  parentOrganization: { '@type': 'Organization', name: site.parent, url: site.mainSite },
+  address: { '@type': 'PostalAddress', addressLocality: 'Conway', addressRegion: 'SC', postalCode: serviceZips[0], addressCountry: 'US' },
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#101010" />
+    <link rel="icon" type="image/svg+xml" href={u('favicon.svg')} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(u('brand/thuro-exteriors-logo.png'), site.url).href} />
+    <meta name="twitter:card" content="summary" />
+    <link rel="sitemap" href={u('sitemap-index.xml')} />
+    <script type="application/ld+json" set:html={JSON.stringify(business)} />
+    {jsonLd.map((obj) => <script type="application/ld+json" set:html={JSON.stringify(obj)} />)}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

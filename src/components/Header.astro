@@ -1,0 +1,58 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+import { u } from '../lib/url';
+
+const nav = [
+  { label: 'Pests We Treat', href: u('#pests') },
+  { label: 'Plans', href: u('#plans') },
+  { label: 'How It Works', href: u('#how-it-works') },
+  { label: 'Service Areas', href: u('#areas') },
+  { label: 'FAQ', href: u('#faq') },
+];
+---
+
+<div class="topbar">
+  <div class="container topbar-inner">
+    <span class="topbar-text"><Icon name="map-pin" size={14} /> Serving {site.region}</span>
+    <a href={site.mainSite} class="topbar-link">&larr; Back to Thuro Exteriors</a>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href={u()} class="wordmark" aria-label="Thuro Pest Control home">
+      <span class="wordmark-main">THURO</span>
+      <span class="wordmark-sub">Pest Control</span>
+    </a>
+
+    <nav class="nav" id="site-nav" aria-label="Main">
+      {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+    </nav>
+
+    <div class="header-actions">
+      <a class="header-phone" href={site.phoneHref}>
+        <Icon name="phone" size={18} /> <span>{site.phone}</span>
+      </a>
+      <a class="btn btn-gold btn-sm" href={u('#estimate')}>Free Estimate</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const nav = document.getElementById('site-nav');
+  toggle?.addEventListener('click', () => {
+    const open = nav?.classList.toggle('open') ?? false;
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+  nav?.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).tagName === 'A') {
+      nav.classList.remove('open');
+      toggle?.setAttribute('aria-expanded', 'false');
+    }
+  });
+</script>
