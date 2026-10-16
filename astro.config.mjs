@@ -7,6 +7,9 @@ export default defineConfig({
   site: 'https://thuroexteriors.com',
   base: '/pest-control',
   trailingSlash: 'always',
+  // Output lands in dist/pest-control so static hosts serve it at the same /pest-control/ path
+  // it will have on thuroexteriors.com.
+  outDir: './dist/pest-control',
   build: { format: 'directory' },
   integrations: [sitemap()],
 });

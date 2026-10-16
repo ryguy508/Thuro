@@ -1,0 +1,8 @@
+{
+  // Cloudflare Workers static-assets deploy. The Worker name must match the project name in the dashboard.
+  "name": "thuro",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "./dist"
+  }
+}
