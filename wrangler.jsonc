@@ -1,8 +1,16 @@
 {
-  // Cloudflare Workers static-assets deploy. The Worker name must match the project name in the dashboard.
+  // Cloudflare Worker: serves the static site and the lead endpoint (/pest-control/api/lead).
+  // The Worker name must match the project name in the dashboard.
   "name": "thuro",
+  "main": "worker/index.ts",
   "compatibility_date": "2025-09-01",
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // Only the API path runs Worker code; pages and files are served straight from assets.
+    "run_worker_first": ["/pest-control/api/*"]
   }
+  // Secrets (Dashboard > thuro > Settings > Variables and Secrets, type "Secret"):
+  //   GHL_TOKEN, GHL_LOCATION_ID, and optionally GHL_PIPELINE_ID, GHL_STAGE_ID.
+  // See docs/ghl-setup.md.
 }

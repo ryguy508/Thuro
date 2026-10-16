@@ -11,7 +11,8 @@ interface Props {
 }
 
 const { id = 'estimate', heading = 'Get Your Free Estimate', pest = '' } = Astro.props;
-const endpoint = import.meta.env.PUBLIC_LEAD_ENDPOINT ?? '';
+// The lead endpoint is a Worker route that forwards to GoHighLevel (see worker/lead.ts).
+const endpoint = import.meta.env.PUBLIC_LEAD_ENDPOINT || `${import.meta.env.BASE_URL.replace(/\/$/, '')}/api/lead`;
 
 const tiles = [
   ...pests.map((p) => ({ value: p.slug, label: p.name, icon: p.icon })),
@@ -52,8 +53,6 @@ const payEnabled = Boolean(site.checkoutUrl);
   data-pest={pest}
 >
   <h2 class="estimate-title">{heading}</h2>
-
-  <p class="est-preview" hidden>Preview mode: requests are not being sent yet.</p>
 
   <div class="est-progress" hidden>
     <div class="est-progress-track"><div class="est-progress-bar"></div></div>
@@ -268,8 +267,6 @@ const payEnabled = Boolean(site.checkoutUrl);
       callWindow: '',
     };
 
-    if (!endpoint) root.querySelector<HTMLElement>('.est-preview')!.hidden = false;
-
     function setText(el: Element | null, text: string) {
       if (!el) return;
       el.textContent = text;
@@ -289,6 +286,8 @@ const payEnabled = Boolean(site.checkoutUrl);
         root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }
+
+    let previewOnly = false;
 
     async function send(stage: 'contact' | 'final', contact?: Record<string, string>) {
       const payload = {
@@ -311,12 +310,11 @@ const payEnabled = Boolean(site.checkoutUrl);
         attribution: attribution(),
         ...contact,
       };
-      if (!endpoint) {
-        console.info('[preview] Lead payload (not sent):', payload);
-        return;
-      }
       const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       if (!res.ok) throw new Error('request-failed');
+      // A preview host with no GoHighLevel connection discards the request and says so.
+      const result = await res.json().catch(() => ({}));
+      if (result.dryRun) previewOnly = true;
     }
 
     let contactInfo: Record<string, string> = {};
@@ -492,7 +490,7 @@ const payEnabled = Boolean(site.checkoutUrl);
         state.followUp === 'call'
           ? `Thanks, ${first}! We will call you ${windows[state.callWindow] ?? 'shortly'} at ${contactInfo.phone}.`
           : `Thanks, ${first}! A Thuro team member will reach out shortly with your free estimate.`;
-      setText(steps.get('done')!.querySelector('[data-done-text]'), text);
+      setText(steps.get('done')!.querySelector('[data-done-text]'), previewOnly ? `${text} (Preview only: this request was not actually sent.)` : text);
       show('done');
     });
 

@@ -1,0 +1,6 @@
+# Copy to .dev.vars for local testing with `npx wrangler dev`. Never commit .dev.vars.
+GHL_TOKEN=
+GHL_LOCATION_ID=
+# Optional: also create a pipeline opportunity for each new estimate
+GHL_PIPELINE_ID=
+GHL_STAGE_ID=

@@ -39,10 +39,9 @@ so the preview is served at `<project>.workers.dev/pest-control/`. Every push to
 
 ## Leads and GoHighLevel
 
-The estimate form POSTs JSON to `PUBLIC_LEAD_ENDPOINT` (see `.env.example`). That endpoint should be a small
-server function that creates/updates the contact in GoHighLevel using a private API token. Never put the
-token in a `PUBLIC_` variable. Until an endpoint is set, production builds show a "please call us" message
-instead of pretending the request was sent.
+The estimate flow posts to a Cloudflare Worker route (`/pest-control/api/lead`, code in `worker/`), which
+creates the contact, custom fields, tags, note, and opportunity in GoHighLevel. Setup steps, the custom
+field list, and the tags are in [docs/ghl-setup.md](docs/ghl-setup.md). `npm test` runs the Worker tests.
 
 ## Before launch checklist
 
@@ -51,4 +50,4 @@ instead of pretending the request was sent.
 - Add SC pest control license number (`src/data/site.ts`)
 - Add real photos, reviews, and pricing language
 - Expand each location page with unique local content
-- Connect the lead endpoint to GoHighLevel
+- Connect GoHighLevel (docs/ghl-setup.md): token, custom fields, Cloudflare secrets, workflows
