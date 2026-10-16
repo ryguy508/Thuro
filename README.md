@@ -31,6 +31,12 @@ Add a pest or town by adding an entry to its data file; the page, links, and sit
 `thuroexteriors.com/pest-control/`. Routing that path to this site while the rest of the domain stays on
 GoHighLevel is done with Cloudflare (DNS + a Worker route). Until then, preview it at its own URL.
 
+## Preview deploys (Cloudflare)
+
+The Cloudflare Workers project `thuro` builds the `claude/affectionate-brown-ej61hd` branch with
+`npm run build` and `npx wrangler deploy` (see `wrangler.jsonc`). The build writes to `dist/pest-control/`,
+so the preview is served at `<project>.workers.dev/pest-control/`. Every push to the branch redeploys.
+
 ## Leads and GoHighLevel
 
 The estimate form POSTs JSON to `PUBLIC_LEAD_ENDPOINT` (see `.env.example`). That endpoint should be a small
