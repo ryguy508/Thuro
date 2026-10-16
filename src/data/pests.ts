@@ -1,6 +1,8 @@
 export interface Pest {
   slug: string;
   name: string;
+  /** Singular service name used in headings and titles, e.g. "Ant Control". */
+  controlName: string;
   icon: string;
   short: string;
   /** Covered by the standard quarterly plan (true) or offered as an add-on / stand-alone service (false). */
@@ -17,6 +19,7 @@ export const pests: Pest[] = [
   {
     slug: 'ants',
     name: 'Ants',
+    controlName: 'Ant Control',
     icon: 'bug',
     short: 'Fire ants, carpenter ants, and the sugar ants that march into kitchens.',
     inPlan: true,
@@ -41,6 +44,7 @@ export const pests: Pest[] = [
   {
     slug: 'cockroaches',
     name: 'Roaches & Palmetto Bugs',
+    controlName: 'Roach & Palmetto Bug Control',
     icon: 'bug',
     short: 'Palmetto bugs and household roaches that hide in warm, damp spots.',
     inPlan: true,
@@ -65,6 +69,7 @@ export const pests: Pest[] = [
   {
     slug: 'spiders',
     name: 'Spiders',
+    controlName: 'Spider Control',
     icon: 'bug',
     short: 'Webs, egg sacs, and the occasional black widow or brown recluse.',
     inPlan: true,
@@ -89,6 +94,7 @@ export const pests: Pest[] = [
   {
     slug: 'wasps-hornets',
     name: 'Wasps & Hornets',
+    controlName: 'Wasp & Hornet Control',
     icon: 'bug',
     short: 'Paper wasps, yellow jackets, and hornets nesting on your home.',
     inPlan: true,
@@ -113,6 +119,7 @@ export const pests: Pest[] = [
   {
     slug: 'mosquitoes',
     name: 'Mosquitoes',
+    controlName: 'Mosquito Control',
     icon: 'droplets',
     short: 'Yard treatments that take back your patio and your evenings.',
     inPlan: false,
@@ -137,6 +144,7 @@ export const pests: Pest[] = [
   {
     slug: 'termites',
     name: 'Termites',
+    controlName: 'Termite Control',
     icon: 'worm',
     short: 'Inspections and protection against the pest that damages homes silently.',
     inPlan: false,
@@ -161,6 +169,7 @@ export const pests: Pest[] = [
   {
     slug: 'rodents',
     name: 'Rodents',
+    controlName: 'Rodent Control',
     icon: 'rat',
     short: 'Rats and mice in attics, walls, and garages, handled for good.',
     inPlan: false,
@@ -185,6 +194,7 @@ export const pests: Pest[] = [
   {
     slug: 'fleas-ticks',
     name: 'Fleas & Ticks',
+    controlName: 'Flea & Tick Control',
     icon: 'paw-print',
     short: 'Protect your pets, your family, and your yard.',
     inPlan: false,
