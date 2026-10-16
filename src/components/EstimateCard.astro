@@ -1,36 +1,142 @@
 ---
 import Icon from './Icon.astro';
-import { serviceZips, site } from '../data/site';
+import { serviceAreaZips, site } from '../data/site';
 import { pests } from '../data/pests';
 
 interface Props {
   id?: string;
   heading?: string;
-  /** Pre-selects a pest in the form, used on pest pages. */
+  /** Pre-selects a pest in the flow, used on pest pages. */
   pest?: string;
 }
 
-const { id = 'estimate', heading = 'Free Cost Estimate', pest = '' } = Astro.props;
+const { id = 'estimate', heading = 'Get Your Free Estimate', pest = '' } = Astro.props;
 const endpoint = import.meta.env.PUBLIC_LEAD_ENDPOINT ?? '';
+
+const tiles = [
+  ...pests.map((p) => ({ value: p.slug, label: p.name, icon: p.icon })),
+  { value: 'not-sure', label: 'Not sure', icon: 'search' },
+];
+const where = [
+  { value: 'inside', label: 'Inside' },
+  { value: 'outside', label: 'Outside' },
+  { value: 'both', label: 'Both' },
+];
+const duration = [
+  { value: 'new', label: 'Just noticed' },
+  { value: 'weeks', label: 'A few weeks' },
+  { value: 'months', label: 'Months or more' },
+];
+const homeType = [
+  { value: 'house', label: 'House' },
+  { value: 'townhome-condo', label: 'Townhome / condo' },
+  { value: 'other', label: 'Other' },
+];
+const size = [
+  { value: 'under-1500', label: 'Under 1,500 sq ft' },
+  { value: '1500-2500', label: '1,500 to 2,500' },
+  { value: '2500-4000', label: '2,500 to 4,000' },
+  { value: '4000-plus', label: '4,000+' },
+  { value: 'unsure', label: 'Not sure' },
+];
+const payEnabled = Boolean(site.checkoutUrl);
 ---
 
-<div class="estimate" id={id} data-estimate data-zips={JSON.stringify(serviceZips)} data-endpoint={endpoint}>
+<div
+  class="estimate"
+  id={id}
+  data-estimate
+  data-zips={JSON.stringify(serviceAreaZips)}
+  data-endpoint={endpoint}
+  data-checkout={site.checkoutUrl}
+  data-pest={pest}
+>
   <h2 class="estimate-title">{heading}</h2>
 
-  <form class="est-zip" novalidate>
+  <p class="est-preview" hidden>Preview mode: requests are not being sent yet.</p>
+
+  <div class="est-progress" hidden>
+    <div class="est-progress-track"><div class="est-progress-bar"></div></div>
+    <span class="est-progress-label"></span>
+  </div>
+
+  <!-- Step 1: ZIP -->
+  <form class="est-step" data-step="zip" novalidate>
     <label for={`${id}-zip`}>ZIP Code</label>
     <div class="zip-field">
       <Icon name="map-pin" size={20} />
       <input id={`${id}-zip`} name="zip" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="Enter your ZIP code" />
     </div>
     <button class="btn btn-gold btn-block" type="submit">Get Your Estimate</button>
-    <p class="est-note">Takes under 2 minutes. No obligation.</p>
+    <p class="est-note">Takes about 2 minutes. No obligation.</p>
+    <p class="est-msg is-error" role="alert" hidden></p>
   </form>
 
-  <p class="est-msg" role="status" aria-live="polite" hidden></p>
+  <!-- Step 2: pests -->
+  <form class="est-step" data-step="pests" novalidate hidden>
+    <h3 class="est-step-title" tabindex="-1">What are you seeing?</h3>
+    <p class="est-step-sub"><span data-city-line></span> Pick everything that applies.</p>
+    <fieldset class="tiles">
+      <legend class="sr-only">Pests</legend>
+      {tiles.map((t) => (
+        <label class="tile">
+          <input type="checkbox" name="pests" value={t.value} checked={t.value === pest} />
+          <span class="tile-body"><Icon name={t.icon} size={24} /> {t.label}</span>
+        </label>
+      ))}
+    </fieldset>
+    <p class="est-error" role="alert" hidden></p>
+    <div class="est-actions">
+      <button class="btn btn-ghost" type="button" data-back="zip">Back</button>
+      <button class="btn btn-gold" type="submit">Next</button>
+    </div>
+  </form>
 
-  <form class="est-lead" novalidate hidden>
-    <input type="hidden" name="zip" />
+  <!-- Step 3: details -->
+  <form class="est-step" data-step="details" novalidate hidden>
+    <h3 class="est-step-title" tabindex="-1">Tell us a bit more</h3>
+    <p class="est-step-sub">Quick taps. This helps us recommend the right service.</p>
+
+    <span class="q-label">Where are you seeing them?</span>
+    <div class="chips">
+      {where.map((o) => <label class="chip"><input type="radio" name="where" value={o.value} /><span>{o.label}</span></label>)}
+    </div>
+
+    <span class="q-label">How long has this been going on?</span>
+    <div class="chips">
+      {duration.map((o) => <label class="chip"><input type="radio" name="duration" value={o.value} /><span>{o.label}</span></label>)}
+    </div>
+
+    <span class="q-label">Type of home</span>
+    <div class="chips">
+      {homeType.map((o) => <label class="chip"><input type="radio" name="homeType" value={o.value} /><span>{o.label}</span></label>)}
+    </div>
+
+    <span class="q-label">Approximate size of your home</span>
+    <div class="chips">
+      {size.map((o) => <label class="chip"><input type="radio" name="size" value={o.value} /><span>{o.label}</span></label>)}
+    </div>
+
+    <div class="est-actions">
+      <button class="btn btn-ghost" type="button" data-back="pests">Back</button>
+      <button class="btn btn-gold" type="submit">See My Recommendation</button>
+    </div>
+  </form>
+
+  <!-- Step 4: recommendation -->
+  <form class="est-step" data-step="plan" novalidate hidden>
+    <h3 class="est-step-title" tabindex="-1">Here is what we recommend</h3>
+    <div data-plan></div>
+    <div class="est-actions">
+      <button class="btn btn-ghost" type="button" data-back="details">Back</button>
+      <button class="btn btn-gold" type="submit">Continue</button>
+    </div>
+  </form>
+
+  <!-- Step 5: contact -->
+  <form class="est-step" data-step="contact" novalidate hidden>
+    <h3 class="est-step-title" tabindex="-1">Where should we send your estimate?</h3>
+    <p class="est-step-sub">We use this only to follow up on your request.</p>
     <div class="field">
       <label for={`${id}-name`}>Full name</label>
       <input id={`${id}-name`} name="name" autocomplete="name" required />
@@ -45,122 +151,354 @@ const endpoint = import.meta.env.PUBLIC_LEAD_ENDPOINT ?? '';
         <input id={`${id}-email`} name="email" type="email" autocomplete="email" required />
       </div>
     </div>
-    <div class="field-row">
-      <div class="field">
-        <label for={`${id}-pest`}>What are you seeing?</label>
-        <select id={`${id}-pest`} name="pest">
-          <option value="">Not sure / general protection</option>
-          {pests.map((p) => <option value={p.name} selected={p.slug === pest}>{p.name}</option>)}
-        </select>
-      </div>
-      <div class="field">
-        <label for={`${id}-service`}>Service type</label>
-        <select id={`${id}-service`} name="service">
-          <option value="Not sure">Not sure yet</option>
-          <option value="Quarterly plan">Quarterly protection plan</option>
-          <option value="One-time">One-time service</option>
-        </select>
-      </div>
+    <div class="field">
+      <label for={`${id}-address`}>Service address</label>
+      <input id={`${id}-address`} name="address" autocomplete="street-address" required />
     </div>
     <div class="field">
-      <label for={`${id}-notes`}>Anything we should know? <span class="optional">(optional)</span></label>
+      <label for={`${id}-notes`}>Anything else we should know? <span class="optional">(optional)</span></label>
       <textarea id={`${id}-notes`} name="notes" rows="2"></textarea>
     </div>
     <!-- Honeypot: real visitors never see or fill this. -->
     <div class="hp" aria-hidden="true">
       <label>Website <input name="website" tabindex="-1" autocomplete="off" /></label>
     </div>
-    <button class="btn btn-gold btn-block" type="submit">Request My Free Estimate</button>
+    <p class="est-consent">
+      By continuing, you agree that Thuro Pest Control may contact you by phone, text, or email about your
+      request. Message and data rates may apply.
+    </p>
     <p class="est-error" role="alert" hidden></p>
+    <div class="est-actions">
+      <button class="btn btn-ghost" type="button" data-back="plan">Back</button>
+      <button class="btn btn-gold" type="submit">Continue</button>
+    </div>
   </form>
 
-  <div class="est-done" hidden>
-    <Icon name="badge-check" size={40} />
-    <h3>Request received</h3>
-    <p>Thanks! A Thuro team member will reach out shortly with your free estimate. Need it sooner? Call <a href={site.phoneHref}>{site.phone}</a>.</p>
+  <!-- Step 6: how to proceed -->
+  <form class="est-step" data-step="next" novalidate hidden>
+    <h3 class="est-step-title" tabindex="-1">How would you like to move forward?</h3>
+    <div class="option-list">
+      {payEnabled && (
+        <label class="option">
+          <input type="radio" name="followUp" value="pay" />
+          <span class="option-title">Book and pay now</span>
+          <span class="option-text">Pick your service and check out online.</span>
+        </label>
+      )}
+      <label class="option">
+        <input type="radio" name="followUp" value="call" />
+        <span class="option-title">Call me</span>
+        <span class="option-text">A Thuro team member calls you to go over details.</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="followUp" value="reach-out" checked />
+        <span class="option-title">Reach out when you can</span>
+        <span class="option-text">We will send your estimate and follow up shortly.</span>
+      </label>
+    </div>
+    <div class="field call-window" hidden>
+      <label for={`${id}-window`}>Best time to call</label>
+      <select id={`${id}-window`} name="callWindow">
+        <option value="asap">As soon as possible</option>
+        <option value="morning">Morning</option>
+        <option value="afternoon">Afternoon</option>
+        <option value="evening">Evening</option>
+      </select>
+    </div>
+    <p class="est-error" role="alert" hidden></p>
+    <div class="est-actions">
+      <button class="btn btn-gold btn-block" type="submit">Confirm</button>
+    </div>
+  </form>
+
+  <!-- Done -->
+  <div class="est-step est-done" data-step="done" hidden>
+    <Icon name="badge-check" size={44} />
+    <h3 class="est-step-title" tabindex="-1">You are all set</h3>
+    <p data-done-text></p>
+    <p class="est-note">Need us sooner? Call <a href={site.phoneHref}>{site.phone}</a>.</p>
   </div>
+
+  <p class="est-msg is-error est-out" hidden></p>
 </div>
 
 <script>
-  type LeadPayload = Record<string, string>;
+  import { recommend, type ServiceOption } from '../data/recommend';
 
-  function setText(el: HTMLElement | null, text: string) {
-    if (!el) return;
-    el.textContent = text;
-    el.hidden = !text;
-  }
+  type Step = 'zip' | 'pests' | 'details' | 'plan' | 'contact' | 'next' | 'done';
+  const PROGRESS: Step[] = ['zip', 'pests', 'details', 'plan', 'contact'];
+  const LABELS = ['Location', 'Problem', 'Details', 'Your plan', 'Contact'];
+  const PHONE = '(978) 608-3019';
 
-  async function submitLead(endpoint: string, payload: LeadPayload) {
-    if (!endpoint) {
-      // Without an endpoint, only pretend to succeed while developing. In production, fail loudly.
-      if (import.meta.env.DEV) {
-        console.info('[dev] Estimate request (no endpoint configured):', payload);
-        return;
-      }
-      throw new Error('not-configured');
-    }
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+  /** Marketing attribution (UTM tags, ad click ids) carried through to the lead record. */
+  function attribution() {
+    const out: Record<string, string> = {};
+    new URLSearchParams(location.search).forEach((value, key) => {
+      if (key.startsWith('utm_') || key === 'gclid' || key === 'fbclid') out[key] = value;
     });
-    if (!res.ok) throw new Error('request-failed');
+    return out;
   }
 
-  document.querySelectorAll<HTMLElement>('[data-estimate]').forEach((root) => {
-    const zips: string[] = JSON.parse(root.dataset.zips ?? '[]');
+  const newId = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+
+  function init(root: HTMLElement) {
+    const zips: Record<string, string> = JSON.parse(root.dataset.zips ?? '{}');
     const endpoint = root.dataset.endpoint ?? '';
-    const zipForm = root.querySelector<HTMLFormElement>('.est-zip')!;
-    const leadForm = root.querySelector<HTMLFormElement>('.est-lead')!;
-    const msg = root.querySelector<HTMLElement>('.est-msg');
-    const done = root.querySelector<HTMLElement>('.est-done')!;
-    const errorEl = root.querySelector<HTMLElement>('.est-error');
+    const checkoutUrl = root.dataset.checkout ?? '';
 
-    zipForm.addEventListener('submit', (e) => {
+    const steps = new Map<Step, HTMLElement>();
+    root.querySelectorAll<HTMLElement>('[data-step]').forEach((el) => steps.set(el.dataset.step as Step, el));
+    const form = (s: Step) => steps.get(s) as HTMLFormElement;
+    const progress = root.querySelector<HTMLElement>('.est-progress')!;
+    const bar = root.querySelector<HTMLElement>('.est-progress-bar')!;
+    const label = root.querySelector<HTMLElement>('.est-progress-label')!;
+
+    const state = {
+      leadId: newId(),
+      zip: '',
+      city: '',
+      pests: [] as string[],
+      where: '',
+      duration: '',
+      homeType: '',
+      size: '',
+      service: '',
+      recommended: '',
+      followUp: 'reach-out',
+      callWindow: '',
+    };
+
+    if (!endpoint) root.querySelector<HTMLElement>('.est-preview')!.hidden = false;
+
+    function setText(el: Element | null, text: string) {
+      if (!el) return;
+      el.textContent = text;
+      (el as HTMLElement).hidden = !text;
+    }
+
+    function show(step: Step) {
+      steps.forEach((el, key) => (el.hidden = key !== step));
+      const index = PROGRESS.indexOf(step);
+      progress.hidden = index < 1;
+      if (index >= 0) {
+        bar.style.width = `${((index + 1) / PROGRESS.length) * 100}%`;
+        label.textContent = `Step ${index + 1} of ${PROGRESS.length}: ${LABELS[index]}`;
+      }
+      if (step !== 'zip') {
+        steps.get(step)?.querySelector<HTMLElement>('.est-step-title')?.focus({ preventScroll: true });
+        root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    async function send(stage: 'contact' | 'final', contact?: Record<string, string>) {
+      const payload = {
+        stage,
+        leadId: state.leadId,
+        source: 'thuro-pest-control',
+        page: location.pathname,
+        submittedAt: new Date().toISOString(),
+        zip: state.zip,
+        city: state.city,
+        pests: state.pests,
+        where: state.where,
+        duration: state.duration,
+        homeType: state.homeType,
+        homeSize: state.size,
+        recommendedService: state.recommended,
+        chosenService: state.service,
+        followUp: stage === 'final' ? state.followUp : '',
+        callWindow: stage === 'final' ? state.callWindow : '',
+        attribution: attribution(),
+        ...contact,
+      };
+      if (!endpoint) {
+        console.info('[preview] Lead payload (not sent):', payload);
+        return;
+      }
+      const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (!res.ok) throw new Error('request-failed');
+    }
+
+    let contactInfo: Record<string, string> = {};
+
+    // Back buttons
+    root.querySelectorAll<HTMLElement>('[data-back]').forEach((btn) =>
+      btn.addEventListener('click', () => show(btn.dataset.back as Step)),
+    );
+
+    // Step 1: ZIP
+    form('zip').addEventListener('submit', (e) => {
       e.preventDefault();
-      const zip = (new FormData(zipForm).get('zip') as string).trim();
-      if (!/^\d{5}$/.test(zip)) {
-        setText(msg, 'Please enter a 5-digit ZIP code.');
-        msg?.classList.add('is-error');
-        return;
-      }
-      msg?.classList.remove('is-error');
-      if (!zips.includes(zip)) {
-        msg?.classList.add('is-error');
-        setText(msg, `We don't serve ${zip} yet. Call us and we'll see what we can do.`);
-        return;
-      }
-      setText(msg, `Good news, we serve ${zip}! Tell us a little about your home.`);
-      (leadForm.elements.namedItem('zip') as HTMLInputElement).value = zip;
-      zipForm.hidden = true;
-      leadForm.hidden = false;
+      const msg = form('zip').querySelector('.est-msg');
+      const zip = String(new FormData(form('zip')).get('zip') ?? '').trim();
+      if (!/^\d{5}$/.test(zip)) return setText(msg, 'Please enter a 5-digit ZIP code.');
+      if (!zips[zip]) return setText(msg, `We do not serve ${zip} yet. Call us at ${PHONE} and we will see what we can do.`);
+      setText(msg, '');
+      state.zip = zip;
+      state.city = zips[zip];
+      setText(root.querySelector('[data-city-line]'), `Good news, we serve ${state.city}.`);
+      show('pests');
     });
 
-    leadForm.addEventListener('submit', async (e) => {
+    // Step 2: pests
+    form('pests').addEventListener('submit', (e) => {
       e.preventDefault();
-      setText(errorEl, '');
-      const data = Object.fromEntries(new FormData(leadForm)) as LeadPayload;
-      if (data.website) return; // honeypot tripped
-      if (!data.name?.trim() || !data.phone?.trim() || !/^\S+@\S+\.\S+$/.test(data.email ?? '')) {
-        setText(errorEl, 'Please add your name, phone number, and a valid email.');
-        return;
-      }
-      const button = leadForm.querySelector<HTMLButtonElement>('button[type="submit"]')!;
-      button.disabled = true;
-      try {
-        await submitLead(endpoint, {
-          ...data,
-          source: 'thuro-pest-control',
-          page: location.pathname,
-          submittedAt: new Date().toISOString(),
+      const picked = new FormData(form('pests')).getAll('pests').map(String);
+      if (picked.length === 0) return setText(form('pests').querySelector('.est-error'), 'Pick at least one, or choose "Not sure".');
+      setText(form('pests').querySelector('.est-error'), '');
+      state.pests = picked;
+      show('details');
+    });
+
+    // Step 3: details, then build the recommendation
+    form('details').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = new FormData(form('details'));
+      state.where = String(data.get('where') ?? '');
+      state.duration = String(data.get('duration') ?? '');
+      state.homeType = String(data.get('homeType') ?? '');
+      state.size = String(data.get('size') ?? '');
+      renderPlan();
+      show('plan');
+    });
+
+    function renderPlan() {
+      const rec = recommend({ pests: state.pests, where: state.where, duration: state.duration, size: state.size });
+      state.recommended = rec.primary.id;
+      state.service = rec.primary.id;
+      const host = form('plan').querySelector<HTMLElement>('[data-plan]')!;
+      host.replaceChildren();
+
+      const reason = document.createElement('p');
+      reason.className = 'est-step-sub';
+      reason.textContent = rec.reason;
+      host.append(reason);
+
+      const list = document.createElement('div');
+      list.className = 'option-list';
+      const options: { opt: ServiceOption; primary: boolean }[] = [
+        { opt: rec.primary, primary: true },
+        ...rec.alternatives.map((opt) => ({ opt, primary: false })),
+      ];
+      options.forEach(({ opt, primary }) => {
+        const wrap = document.createElement('label');
+        wrap.className = 'option';
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'service';
+        input.value = opt.id;
+        input.checked = primary;
+        const title = document.createElement('span');
+        title.className = 'option-title';
+        title.textContent = opt.title;
+        if (primary) {
+          const badge = document.createElement('span');
+          badge.className = 'option-badge';
+          badge.textContent = 'Recommended';
+          title.append(' ', badge);
+        }
+        const text = document.createElement('span');
+        text.className = 'option-text';
+        text.textContent = opt.blurb;
+        const inc = document.createElement('ul');
+        inc.className = 'option-includes';
+        opt.includes.forEach((item) => {
+          const li = document.createElement('li');
+          li.textContent = item;
+          inc.append(li);
         });
-        leadForm.hidden = true;
-        msg!.hidden = true;
-        done.hidden = false;
+        wrap.append(input, title, text, inc);
+        list.append(wrap);
+      });
+      host.append(list);
+
+      if (rec.addOns.length) {
+        const add = document.createElement('p');
+        add.className = 'est-note est-addon';
+        add.textContent = `We would also look at: ${rec.addOns.join(', ')}.`;
+        host.append(add);
+      }
+      const fine = document.createElement('p');
+      fine.className = 'est-note';
+      fine.textContent = 'Your exact price is confirmed after a quick review. No obligation.';
+      host.append(fine);
+    }
+
+    // Step 4: plan choice
+    form('plan').addEventListener('submit', (e) => {
+      e.preventDefault();
+      state.service = String(new FormData(form('plan')).get('service') ?? state.recommended);
+      show('contact');
+    });
+
+    // Step 5: contact, which captures the lead before anything else is asked
+    form('contact').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = form('contact');
+      const err = f.querySelector('.est-error');
+      setText(err, '');
+      const data = Object.fromEntries(new FormData(f)) as Record<string, string>;
+      if (data.website) return show('done'); // honeypot tripped: pretend success, send nothing
+      if (!data.name?.trim() || !data.phone?.trim() || !data.address?.trim() || !/^\S+@\S+\.\S+$/.test(data.email ?? '')) {
+        return setText(err, 'Please add your name, phone, email, and service address.');
+      }
+      const submit = f.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+      submit.disabled = true;
+      try {
+        contactInfo = { name: data.name.trim(), phone: data.phone.trim(), email: data.email.trim(), address: data.address.trim(), notes: (data.notes ?? '').trim() };
+        await send('contact', contactInfo);
+        show('next');
       } catch {
-        setText(errorEl, 'Sorry, we could not send that. Please call us at (978) 608-3019.');
-        button.disabled = false;
+        setText(err, `Sorry, we could not send that. Please call us at ${PHONE}.`);
+      } finally {
+        submit.disabled = false;
       }
     });
-  });
+
+    // Step 6: follow-up choice
+    const nextForm = form('next');
+    const windowField = nextForm.querySelector<HTMLElement>('.call-window')!;
+    nextForm.addEventListener('change', () => {
+      windowField.hidden = new FormData(nextForm).get('followUp') !== 'call';
+    });
+    nextForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const err = nextForm.querySelector('.est-error');
+      setText(err, '');
+      const data = new FormData(nextForm);
+      state.followUp = String(data.get('followUp') ?? 'reach-out');
+      state.callWindow = state.followUp === 'call' ? String(data.get('callWindow') ?? 'asap') : '';
+      const submit = nextForm.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+      submit.disabled = true;
+      try {
+        await send('final', contactInfo);
+      } catch {
+        setText(err, `Sorry, we could not send that. Please call us at ${PHONE}.`);
+        submit.disabled = false;
+        return;
+      }
+      submit.disabled = false;
+      if (state.followUp === 'pay' && checkoutUrl) {
+        const url = new URL(checkoutUrl);
+        url.searchParams.set('name', contactInfo.name);
+        url.searchParams.set('email', contactInfo.email);
+        url.searchParams.set('phone', contactInfo.phone);
+        location.href = url.href;
+        return;
+      }
+      const first = (contactInfo.name ?? '').split(' ')[0];
+      const windows: Record<string, string> = { asap: 'as soon as we can', morning: 'in the morning', afternoon: 'in the afternoon', evening: 'in the evening' };
+      const text =
+        state.followUp === 'call'
+          ? `Thanks, ${first}! We will call you ${windows[state.callWindow] ?? 'shortly'} at ${contactInfo.phone}.`
+          : `Thanks, ${first}! A Thuro team member will reach out shortly with your free estimate.`;
+      setText(steps.get('done')!.querySelector('[data-done-text]'), text);
+      show('done');
+    });
+
+    // Pest pages preselect a tile; carry that through
+    if (root.dataset.pest) state.pests = [root.dataset.pest];
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-estimate]').forEach(init);
 </script>

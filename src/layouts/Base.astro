@@ -4,7 +4,7 @@ import '@fontsource-variable/playfair-display';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { site, serviceZips } from '../data/site';
+import { site } from '../data/site';
 import { towns } from '../data/towns';
 import { u } from '../lib/url';
 
@@ -29,7 +29,7 @@ const business = {
   description: 'Residential pest control, quarterly protection plans, and one-time treatments.',
   areaServed: towns.map((t) => ({ '@type': 'City', name: `${t.name}, SC` })),
   parentOrganization: { '@type': 'Organization', name: site.parent, url: site.mainSite },
-  address: { '@type': 'PostalAddress', addressLocality: 'Conway', addressRegion: 'SC', postalCode: serviceZips[0], addressCountry: 'US' },
+  address: { '@type': 'PostalAddress', addressLocality: 'Conway', addressRegion: 'SC', postalCode: '29526', addressCountry: 'US' },
 };
 ---
 
