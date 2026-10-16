@@ -363,3 +363,23 @@ ul { margin: 0; padding: 0; list-style: none; }
 .est-done { text-align: center; color: var(--leaf); padding: 6px 0; }
 .est-done .est-step-title { color: var(--ink); margin-top: 10px; }
 .est-done p { color: var(--muted); }
+
+/* Recommendation screen */
+.plan-heading { font-family: var(--font-sans); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-dark); margin: 20px 0 10px; }
+.severity { border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; border: 1px solid; }
+.severity strong { display: block; font-size: 0.9rem; }
+.severity p { margin: 4px 0 0; font-size: 0.85rem; }
+.severity-light { background: #eef6f1; border-color: #cfe3d7; color: #1f4d38; }
+.severity-moderate { background: #f6f1e0; border-color: #e5dcb8; color: #4d4220; }
+.severity-heavy { background: #fff1e0; border-color: #f0cfa0; color: #7a4a12; }
+.option-soft { border-style: dashed; }
+.treat { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; background: var(--white); }
+.treat-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.treat-icon { display: grid; place-items: center; flex: none; width: 38px; height: 38px; border-radius: 10px; background: var(--ink); color: var(--gold); }
+.treat-titles { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; line-height: 1.25; }
+.treat-titles strong { font-size: 0.95rem; }
+.treat-steps { display: grid; gap: 5px; font-size: 0.84rem; margin: 0 0 8px; }
+.treat-steps li::before { content: '\2713'; color: var(--gold-dark); font-weight: 800; margin-right: 8px; }
+.treat-note { font-size: 0.82rem; font-style: italic; color: var(--muted); margin: 0 0 8px; }
+.treat-include { display: flex; align-items: center; gap: 10px; margin: 10px 0 0 !important; padding-top: 10px; border-top: 1px dashed var(--line); font-size: 0.85rem !important; font-weight: 700 !important; cursor: pointer; }
+.estimate .treat-include input { width: 18px; height: 18px; padding: 0; accent-color: var(--gold-dark); }

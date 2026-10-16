@@ -22,12 +22,18 @@ export const sizeLabels: Record<string, string> = {
   '4000-plus': '4,000+ sq ft',
   unsure: 'Not sure',
 };
+/** The main plan a customer picks. Specific treatments are add-ons (below). */
 export const serviceLabels: Record<string, string> = {
   quarterly: 'Quarterly Protection Plan',
   'one-time': 'One-Time Service',
-  termite: 'Termite Inspection & Protection',
-  rodent: 'Rodent Inspection & Control',
-  yard: 'Yard Treatment (mosquito / flea & tick)',
 };
+/** Treatments sold on top of (or instead of) the main plan, keyed by pest slug. */
+export const addOnLabels: Record<string, string> = {
+  termites: 'Termite Inspection',
+  rodents: 'Rodent Inspection & Exclusion',
+  mosquitoes: 'Mosquito Yard Treatment',
+  'fleas-ticks': 'Flea & Tick Treatment',
+};
+export const severityLabels: Record<string, string> = { light: 'Light', moderate: 'Moderate', heavy: 'Heavy' };
 export const followUpLabels: Record<string, string> = { call: 'Call me', 'reach-out': 'Reach out when you can', pay: 'Book and pay now' };
 export const callWindowLabels: Record<string, string> = { asap: 'As soon as possible', morning: 'Morning', afternoon: 'Afternoon', evening: 'Evening' };

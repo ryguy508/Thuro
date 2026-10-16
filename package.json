@@ -8,7 +8,7 @@
     "build": "astro build && node scripts/postbuild.mjs",
     "preview": "astro preview",
     "check": "astro check",
-    "test": "node --experimental-strip-types --no-warnings --test worker/*.test.ts",
+    "test": "node --experimental-strip-types --no-warnings --test worker/*.test.ts shared/*.test.ts",
     "ghl:fields": "node --experimental-strip-types --no-warnings scripts/ghl-setup-fields.ts"
   },
   "dependencies": {

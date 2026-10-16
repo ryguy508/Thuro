@@ -10,7 +10,7 @@ The Worker (`worker/lead.ts`) holds the GHL token as a secret, re-validates ever
 
 1. Creates or updates the **contact** (matched by email/phone per your GHL duplicate settings) and fills the custom fields.
 2. Adds **tags** (added, never replaced, so existing customers keep their tags).
-3. Adds a readable **note** with the full summary.
+3. Adds a readable **note** with the full summary, including the plan the customer was shown.
 4. Creates a pipeline **opportunity** (first stage only, and only if a pipeline is configured).
 
 The request is sent twice per customer: once when they enter their contact info (`estimate-started`, so a lead exists even if they leave) and once when they choose how to proceed (`estimate-complete`).
@@ -44,6 +44,9 @@ These are created as **Contact** custom fields, all text:
 | Pest Control - Home Size | 2,500 to 4,000 sq ft |
 | Pest Control - Service Recommended | Quarterly Protection Plan |
 | Pest Control - Service Chosen | Quarterly Protection Plan |
+| Pest Control - Add-On Services | Termite Inspection, Mosquito Yard Treatment |
+| Pest Control - Estimated Severity | Light, Moderate, or Heavy (from how long and where) |
+| Pest Control - Recommended Treatment Plan (large text) | the treatments the customer was shown, step by step |
 | Pest Control - Follow-Up Preference | Call me |
 | Pest Control - Best Time To Call | Afternoon |
 | Pest Control - Customer Notes (large text) | Gate code 1234 |
@@ -82,7 +85,9 @@ Until `GHL_TOKEN` and `GHL_LOCATION_ID` exist, preview links on `*.workers.dev` 
 | `estimate-started` | entered contact info (may not have finished) |
 | `estimate-complete` | finished and chose how to proceed |
 | `pest-ants`, `pest-termites`, ... | pests they selected |
-| `service-quarterly`, `service-termite`, ... | service they chose |
+| `service-quarterly`, `service-one-time` | main plan they chose |
+| `addon-termites`, `addon-rodents`, `addon-mosquitoes`, `addon-fleas-ticks` | add-on treatments they kept in their estimate |
+| `severity-light`, `severity-moderate`, `severity-heavy` | estimated urgency |
 | `followup-call`, `followup-reach-out`, `followup-pay` | how they want to proceed |
 
 Suggested workflows:
@@ -90,7 +95,8 @@ Suggested workflows:
 - Tag added `estimate-complete`: notify the team, send a confirmation text/email.
 - Tag `followup-call`: create a task to call at their best time (see "Best Time To Call").
 - Tag `estimate-started` with no `estimate-complete` after 1 hour: abandoned-estimate follow-up.
-- Tag `pest-termites`: route to your termite inspection calendar.
+- Tag `addon-termites`: route to your termite inspection calendar.
+- Tag `severity-heavy`: prioritize the call-back, since these customers have had the problem for months.
 
 ## Things to know
 

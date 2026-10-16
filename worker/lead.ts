@@ -1,11 +1,14 @@
 import { fieldDefs, fieldName, type FieldKey } from '../shared/ghl-fields.ts';
+import { planSummary, recommend, severityOf } from '../shared/recommend.ts';
 import {
+  addOnLabels,
   callWindowLabels,
   durationLabels,
   followUpLabels,
   homeTypeLabels,
   pestLabels,
   serviceLabels,
+  severityLabels,
   sizeLabels,
   whereLabels,
 } from '../shared/labels.ts';
@@ -42,6 +45,7 @@ export interface Lead {
   homeSize: string;
   recommendedService: string;
   chosenService: string;
+  addOns: string[];
   followUp: string;
   callWindow: string;
   name: string;
@@ -103,6 +107,7 @@ export function parseLead(raw: unknown): { lead?: Lead; error?: string; ignored?
       homeSize: oneOf(b.homeSize, sizeLabels),
       recommendedService: oneOf(b.recommendedService, serviceLabels),
       chosenService: oneOf(b.chosenService, serviceLabels),
+      addOns: Array.isArray(b.addOns) ? [...new Set(b.addOns.filter((x): x is string => typeof x === 'string' && x in addOnLabels))] : [],
       followUp: oneOf(b.followUp, followUpLabels),
       callWindow: oneOf(b.callWindow, callWindowLabels),
       name,
@@ -134,9 +139,13 @@ export function buildTags(lead: Lead) {
   const tags = ['pest-control', SOURCE_TAG, lead.stage === 'final' ? 'estimate-complete' : 'estimate-started'];
   lead.pests.forEach((p) => tags.push(`pest-${p}`));
   if (lead.chosenService) tags.push(`service-${lead.chosenService}`);
+  lead.addOns.forEach((a) => tags.push(`addon-${a}`));
+  tags.push(`severity-${severityOf(lead.where, lead.duration)}`);
   if (lead.stage === 'final' && lead.followUp) tags.push(`followup-${lead.followUp}`);
   return tags;
 }
+
+const recommendFor = (lead: Lead) => recommend({ pests: lead.pests, where: lead.where, duration: lead.duration, homeType: lead.homeType });
 
 export function buildFieldValues(lead: Lead): Partial<Record<FieldKey, string>> {
   const a = lead.attribution;
@@ -148,6 +157,9 @@ export function buildFieldValues(lead: Lead): Partial<Record<FieldKey, string>> 
     homeSize: sizeLabels[lead.homeSize],
     recommended: serviceLabels[lead.recommendedService],
     chosen: serviceLabels[lead.chosenService],
+    addOns: lead.addOns.map((x) => addOnLabels[x]).join(', '),
+    severity: severityLabels[severityOf(lead.where, lead.duration)],
+    planSummary: planSummary(recommendFor(lead)),
     followUp: followUpLabels[lead.followUp],
     callWindow: callWindowLabels[lead.callWindow],
     notes: lead.notes,
@@ -173,8 +185,11 @@ export function buildNote(lead: Lead) {
     lead.homeType || lead.homeSize ? `Home: ${[homeTypeLabels[lead.homeType], sizeLabels[lead.homeSize]].filter(Boolean).join(', ')}` : '',
     lead.recommendedService ? `Recommended: ${serviceLabels[lead.recommendedService]}` : '',
     lead.chosenService ? `Chose: ${serviceLabels[lead.chosenService]}` : '',
+    lead.addOns.length ? `Add-ons selected: ${lead.addOns.map((x) => addOnLabels[x]).join(', ')}` : '',
+    `Estimated severity: ${severityLabels[severityOf(lead.where, lead.duration)]}`,
     lead.stage === 'final' && lead.followUp ? `Wants: ${followUpLabels[lead.followUp]}${lead.callWindow ? ` (${callWindowLabels[lead.callWindow]})` : ''}` : '',
     lead.notes ? `Customer notes: ${lead.notes}` : '',
+    lead.stage === 'final' ? `\nPlan shown to customer:\n${planSummary(recommendFor(lead))}` : '',
   ];
   return lines.filter(Boolean).join('\n');
 }
@@ -312,7 +327,7 @@ export async function handleLead(request: Request, env: Env, doFetch: FetchLike 
         pipelineId: env.GHL_PIPELINE_ID,
         locationId: env.GHL_LOCATION_ID,
         pipelineStageId: env.GHL_STAGE_ID || undefined,
-        name: `${lead.name} - ${serviceLabels[lead.chosenService] ?? 'Pest control estimate'}`,
+        name: `${lead.name} - ${serviceLabels[lead.chosenService] ?? (lead.addOns.map((x) => addOnLabels[x]).join(', ') || 'Pest control estimate')}`,
         status: 'open',
         contactId,
       }),

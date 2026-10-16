@@ -17,6 +17,7 @@ const validBody = {
   homeSize: '2500-4000',
   recommendedService: 'quarterly',
   chosenService: 'quarterly',
+  addOns: ['termites', 'bogus'],
   name: 'Jane Q Tester',
   phone: '(843) 555-0100',
   email: 'Jane@Example.com',
@@ -90,7 +91,8 @@ describe('helpers', () => {
 
   it('builds tags that distinguish started from completed estimates', () => {
     const lead = parseLead(validBody).lead!;
-    assert.deepEqual(buildTags(lead), ['pest-control', 'web-estimate', 'estimate-started', 'pest-ants', 'pest-spiders', 'pest-termites', 'service-quarterly']);
+    assert.deepEqual(lead.addOns, ['termites']);
+    assert.deepEqual(buildTags(lead), ['pest-control', 'web-estimate', 'estimate-started', 'pest-ants', 'pest-spiders', 'pest-termites', 'service-quarterly', 'addon-termites', 'severity-heavy']);
     const done = buildTags({ ...lead, stage: 'final', followUp: 'call' });
     assert.ok(done.includes('estimate-complete') && done.includes('followup-call'));
   });
@@ -100,6 +102,10 @@ describe('helpers', () => {
     assert.equal(values.pests, 'Ants, Spiders, Termites');
     assert.equal(values.callWindow, undefined);
     assert.equal(values.clickId, 'G123');
+    assert.equal(values.addOns, 'Termite Inspection');
+    assert.equal(values.severity, 'Heavy');
+    assert.match(values.planSummary!, /Termite Inspection \(add-on\)/);
+    assert.match(values.planSummary!, /Ant Colony & Perimeter Treatment \(quarterly plan\)/);
   });
 });
 

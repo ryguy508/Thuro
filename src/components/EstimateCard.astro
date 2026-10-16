@@ -54,6 +54,10 @@ const payEnabled = Boolean(site.checkoutUrl);
 >
   <h2 class="estimate-title">{heading}</h2>
 
+  <div hidden data-icons>
+    {tiles.map((t) => <span data-icon={t.value}><Icon name={t.icon} size={22} /></span>)}
+  </div>
+
   <div class="est-progress" hidden>
     <div class="est-progress-track"><div class="est-progress-bar"></div></div>
     <span class="est-progress-label"></span>
@@ -222,7 +226,8 @@ const payEnabled = Boolean(site.checkoutUrl);
 </div>
 
 <script>
-  import { recommend, type ServiceOption } from '../data/recommend';
+  import { recommend } from '../../shared/recommend.ts';
+  import { severityLabels } from '../../shared/labels.ts';
 
   type Step = 'zip' | 'pests' | 'details' | 'plan' | 'contact' | 'next' | 'done';
   const PROGRESS: Step[] = ['zip', 'pests', 'details', 'plan', 'contact'];
@@ -262,6 +267,7 @@ const payEnabled = Boolean(site.checkoutUrl);
       homeType: '',
       size: '',
       service: '',
+      addOns: [] as string[],
       recommended: '',
       followUp: 'reach-out',
       callWindow: '',
@@ -305,6 +311,7 @@ const payEnabled = Boolean(site.checkoutUrl);
         homeSize: state.size,
         recommendedService: state.recommended,
         chosenService: state.service,
+        addOns: state.addOns,
         followUp: stage === 'final' ? state.followUp : '',
         callWindow: stage === 'final' ? state.callWindow : '',
         attribution: attribution(),
@@ -360,72 +367,90 @@ const payEnabled = Boolean(site.checkoutUrl);
       show('plan');
     });
 
+    function el<K extends keyof HTMLElementTagNameMap>(tag: K, className = '', content = '') {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (content) node.textContent = content;
+      return node;
+    }
+
+    function checkOption(type: 'radio' | 'checkbox', name: string, value: string, checked: boolean) {
+      const input = el('input');
+      input.type = type;
+      input.name = name;
+      input.value = value;
+      input.checked = checked;
+      return input;
+    }
+
     function renderPlan() {
-      const rec = recommend({ pests: state.pests, where: state.where, duration: state.duration, size: state.size });
-      state.recommended = rec.primary.id;
-      state.service = rec.primary.id;
+      const rec = recommend({ pests: state.pests, where: state.where, duration: state.duration, homeType: state.homeType });
+      state.recommended = rec.planOptions[0]?.id ?? '';
+      state.service = state.recommended;
+      state.addOns = [];
       const host = form('plan').querySelector<HTMLElement>('[data-plan]')!;
       host.replaceChildren();
 
-      const reason = document.createElement('p');
-      reason.className = 'est-step-sub';
-      reason.textContent = rec.reason;
-      host.append(reason);
+      // How serious this looks, in plain words
+      const banner = el('div', `severity severity-${rec.severity}`);
+      banner.append(el('strong', '', `Estimated activity: ${severityLabels[rec.severity]}`), el('p', '', rec.severityNote));
+      host.append(banner, el('p', 'est-step-sub', rec.reason));
 
-      const list = document.createElement('div');
-      list.className = 'option-list';
-      const options: { opt: ServiceOption; primary: boolean }[] = [
-        { opt: rec.primary, primary: true },
-        ...rec.alternatives.map((opt) => ({ opt, primary: false })),
-      ];
-      options.forEach(({ opt, primary }) => {
-        const wrap = document.createElement('label');
-        wrap.className = 'option';
-        const input = document.createElement('input');
-        input.type = 'radio';
-        input.name = 'service';
-        input.value = opt.id;
-        input.checked = primary;
-        const title = document.createElement('span');
-        title.className = 'option-title';
-        title.textContent = opt.title;
-        if (primary) {
-          const badge = document.createElement('span');
-          badge.className = 'option-badge';
-          badge.textContent = 'Recommended';
-          title.append(' ', badge);
-        }
-        const text = document.createElement('span');
-        text.className = 'option-text';
-        text.textContent = opt.blurb;
-        const inc = document.createElement('ul');
-        inc.className = 'option-includes';
-        opt.includes.forEach((item) => {
-          const li = document.createElement('li');
-          li.textContent = item;
-          inc.append(li);
+      // Main plan
+      if (rec.planOptions.length) {
+        host.append(el('h4', 'plan-heading', 'Your protection'));
+        const list = el('div', 'option-list');
+        rec.planOptions.forEach((opt, i) => {
+          const wrap = el('label', 'option');
+          const title = el('span', 'option-title', opt.title);
+          if (i === 0) title.append(' ', el('span', 'option-badge', 'Recommended'));
+          const includes = el('ul', 'option-includes');
+          opt.includes.forEach((item) => includes.append(el('li', '', item)));
+          wrap.append(checkOption('radio', 'service', opt.id, i === 0), title, el('span', 'option-text', opt.blurb), includes);
+          list.append(wrap);
         });
-        wrap.append(input, title, text, inc);
-        list.append(wrap);
-      });
-      host.append(list);
-
-      if (rec.addOns.length) {
-        const add = document.createElement('p');
-        add.className = 'est-note est-addon';
-        add.textContent = `We would also look at: ${rec.addOns.join(', ')}.`;
-        host.append(add);
+        host.append(list);
+      } else if (rec.optionalPlan) {
+        const wrap = el('label', 'option option-soft');
+        const title = el('span', 'option-title', `Add year-round protection: ${rec.optionalPlan.title}`);
+        const includes = el('ul', 'option-includes');
+        rec.optionalPlan.includes.forEach((item) => includes.append(el('li', '', item)));
+        wrap.append(checkOption('checkbox', 'optionalPlan', rec.optionalPlan.id, false), title, el('span', 'option-text', rec.optionalPlan.blurb), includes);
+        host.append(el('h4', 'plan-heading', 'Want ongoing protection too?'), wrap);
       }
-      const fine = document.createElement('p');
-      fine.className = 'est-note';
-      fine.textContent = 'Your exact price is confirmed after a quick review. No obligation.';
-      host.append(fine);
+
+      // What we would do for each pest they picked
+      host.append(el('h4', 'plan-heading', "Targeted for what you're seeing"));
+      rec.treatments.forEach((t) => {
+        const card = el('div', 'treat');
+        const head = el('div', 'treat-head');
+        const icon = el('span', 'treat-icon');
+        icon.innerHTML = root.querySelector(`[data-icons] [data-icon="${t.pest}"]`)?.innerHTML ?? '';
+        const titles = el('div', 'treat-titles');
+        titles.append(el('strong', '', t.title), el('span', `tag ${t.kind === 'plan' ? 'tag-plan' : ''}`, t.kind === 'plan' ? 'Included in plan' : 'Add-on service'));
+        head.append(icon, titles);
+        const steps = el('ul', 'treat-steps');
+        t.steps.forEach((step) => steps.append(el('li', '', step)));
+        card.append(head, steps);
+        if (t.note) card.append(el('p', 'treat-note', t.note));
+        if (t.kind === 'addon') {
+          // Pre-checked because the customer told us they have this problem; they can remove it.
+          const include = el('label', 'treat-include');
+          include.append(checkOption('checkbox', 'addons', t.pest, true), el('span', '', 'Include in my estimate'));
+          card.append(include);
+        }
+        host.append(card);
+      });
+
+      host.append(el('p', 'est-note', 'Your exact price is confirmed after a quick review. No obligation.'));
     }
 
     // Step 4: plan choice
     form('plan').addEventListener('submit', (e) => {
       e.preventDefault();
-      state.service = String(new FormData(form('plan')).get('service') ?? state.recommended);
+      const data = new FormData(form('plan'));
+      state.service = String(data.get('service') ?? data.get('optionalPlan') ?? '');
+      state.addOns = data.getAll('addons').map(String);
       show('contact');
     });
 

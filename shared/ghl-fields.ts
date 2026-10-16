@@ -10,6 +10,9 @@ export type FieldKey =
   | 'homeSize'
   | 'recommended'
   | 'chosen'
+  | 'addOns'
+  | 'severity'
+  | 'planSummary'
   | 'followUp'
   | 'callWindow'
   | 'notes'
@@ -36,6 +39,9 @@ export const fieldDefs: FieldDef[] = [
   { key: 'homeSize', label: 'Home Size', type: 'TEXT', example: '2,500 to 4,000 sq ft' },
   { key: 'recommended', label: 'Service Recommended', type: 'TEXT', example: 'Quarterly Protection Plan' },
   { key: 'chosen', label: 'Service Chosen', type: 'TEXT', example: 'Quarterly Protection Plan' },
+  { key: 'addOns', label: 'Add-On Services', type: 'TEXT', example: 'Termite Inspection, Mosquito Yard Treatment' },
+  { key: 'severity', label: 'Estimated Severity', type: 'TEXT', example: 'Moderate' },
+  { key: 'planSummary', label: 'Recommended Treatment Plan', type: 'LARGE_TEXT', example: 'Ant Colony & Perimeter Treatment: ...' },
   { key: 'followUp', label: 'Follow-Up Preference', type: 'TEXT', example: 'Call me' },
   { key: 'callWindow', label: 'Best Time To Call', type: 'TEXT', example: 'Afternoon' },
   { key: 'notes', label: 'Customer Notes', type: 'LARGE_TEXT', example: 'Gate code is 1234' },
