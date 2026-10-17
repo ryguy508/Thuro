@@ -26,10 +26,11 @@ const breadcrumbLd = {
 ---
 
 <Base
-  title={`Pest Control in ${town.name}, SC | Thuro Pest Control`}
+  title={`Professional Pest Control in ${town.name}, SC | Thuro Pest Control`}
   description={`Thuro Pest Control protects ${town.name}, SC homes with quarterly plans and one-time treatments. Family- and pet-friendly, licensed and insured. Free estimates.`}
   path={`locations/${town.slug}/`}
   jsonLd={[breadcrumbLd]}
+  town={town}
 >
   <section class="hero hero-sm">
     <div class="container hero-grid">
@@ -37,8 +38,8 @@ const breadcrumbLd = {
         <nav class="crumbs" aria-label="Breadcrumb">
           <a href={u()}>Pest Control</a> / <span>{town.name}</span>
         </nav>
-        <span class="eyebrow">Serving {town.name}, SC</span>
-        <h1>Pest Control in {town.name}, SC</h1>
+        <span class="eyebrow">Thuro Pest Control in {town.name}, SC</span>
+        <h1>Professional Pest Control in {town.name}, SC</h1>
         <p class="lede">{town.blurb}</p>
         <ul class="hero-points">
           <li><Icon name="check" size={20} /> Licensed &amp; insured in South Carolina</li>

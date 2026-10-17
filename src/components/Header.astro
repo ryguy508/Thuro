@@ -1,20 +1,38 @@
 ---
 import Icon from './Icon.astro';
 import { site } from '../data/site';
+import { pests } from '../data/pests';
+import { towns, type Town } from '../data/towns';
 import { u } from '../lib/url';
 
-const nav = [
-  { label: 'Pests We Control', href: u('#pests') },
+interface Props {
+  /** Set on location pages so the header brands the page as "Thuro Pest Control in {town}". */
+  town?: Town;
+}
+
+const { town } = Astro.props;
+const locationLabel = town ? `Thuro Pest Control in ${town.name}` : 'Thuro Pest Control · Grand Strand, SC';
+
+const simpleLinks = [
   { label: 'Plans', href: u('#plans') },
   { label: 'How It Works', href: u('#how-it-works') },
-  { label: 'Service Areas', href: u('#areas') },
-  { label: 'FAQ', href: u('#faq') },
 ];
 ---
 
 <div class="topbar">
   <div class="container topbar-inner">
-    <span class="topbar-text"><Icon name="map-pin" size={14} /> Serving {site.region}</span>
+    <div class="loc" data-dropdown>
+      <button class="loc-btn" type="button" data-dropdown-toggle aria-expanded="false" aria-controls="loc-panel">
+        <Icon name="map-pin" size={15} />
+        <span class="loc-label">{locationLabel}</span>
+        <Icon name="chevron-down" size={14} />
+      </button>
+      <div class="loc-panel" id="loc-panel" aria-label="Choose your location">
+        <p class="loc-title">Choose your location</p>
+        <a href={u()} aria-current={town ? undefined : 'page'}>All Grand Strand areas</a>
+        {towns.map((t) => <a href={u(`locations/${t.slug}/`)} aria-current={town?.slug === t.slug ? 'page' : undefined}>{t.name}</a>)}
+      </div>
+    </div>
     <a href={site.mainSite} class="topbar-link">&larr; Back to Thuro Exteriors</a>
   </div>
 </div>
@@ -27,7 +45,44 @@ const nav = [
     </a>
 
     <nav class="nav" id="site-nav" aria-label="Main">
-      {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+      <div class="nav-item has-sub" data-dropdown>
+        <a class="nav-link" href={u('#pests')}>Pests We Control</a>
+        <button class="sub-toggle" type="button" data-dropdown-toggle aria-expanded="false" aria-label="Show pests menu">
+          <Icon name="chevron-down" size={14} />
+        </button>
+        <div class="submenu submenu-pests">
+          <div class="submenu-grid">
+            {pests.map((p) => (
+              <a class="sub-link" href={u(`pests/${p.slug}/`)}>
+                <span class="sub-icon"><Icon name={p.icon} size={18} /></span>
+                <span class="sub-text">
+                  <strong>{p.name}</strong>
+                  <small>{p.inPlan ? 'In quarterly plan' : 'Add-on service'}</small>
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {simpleLinks.map((l) => <div class="nav-item"><a class="nav-link" href={l.href}>{l.label}</a></div>)}
+
+      <div class="nav-item has-sub" data-dropdown>
+        <a class="nav-link" href={u('#areas')}>Service Areas</a>
+        <button class="sub-toggle" type="button" data-dropdown-toggle aria-expanded="false" aria-label="Show service areas menu">
+          <Icon name="chevron-down" size={14} />
+        </button>
+        <div class="submenu submenu-areas">
+          <div class="submenu-grid submenu-grid-3">
+            {towns.map((t) => (
+              <a class="sub-link sub-link-area" href={u(`locations/${t.slug}/`)}><Icon name="map-pin" size={16} /> {t.name}</a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-item"><a class="nav-link" href={u('#faq')}>FAQ</a></div>
+      <a class="btn btn-gold nav-call" href={site.phoneHref}><Icon name="phone" size={18} /> Call {site.phone}</a>
     </nav>
 
     <div class="header-actions">
@@ -43,16 +98,48 @@ const nav = [
 </header>
 
 <script>
-  const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const menuToggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
   const nav = document.getElementById('site-nav');
-  toggle?.addEventListener('click', () => {
-    const open = nav?.classList.toggle('open') ?? false;
-    toggle.setAttribute('aria-expanded', String(open));
+  const dropdowns = Array.from(document.querySelectorAll<HTMLElement>('[data-dropdown]'));
+
+  function closeAll(except?: HTMLElement) {
+    dropdowns.forEach((d) => {
+      if (d === except) return;
+      d.classList.remove('open');
+      d.querySelector('[data-dropdown-toggle]')?.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  dropdowns.forEach((dropdown) => {
+    const toggle = dropdown.querySelector<HTMLElement>('[data-dropdown-toggle]');
+    toggle?.addEventListener('click', () => {
+      const open = !dropdown.classList.contains('open');
+      closeAll(dropdown);
+      dropdown.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+    });
   });
+
+  document.addEventListener('click', (e) => {
+    if (!(e.target as HTMLElement).closest('[data-dropdown]')) closeAll();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const openOne = dropdowns.find((d) => d.classList.contains('open'));
+    closeAll();
+    openOne?.querySelector<HTMLElement>('[data-dropdown-toggle]')?.focus();
+  });
+
+  menuToggle?.addEventListener('click', () => {
+    const open = nav?.classList.toggle('open') ?? false;
+    menuToggle.setAttribute('aria-expanded', String(open));
+  });
+  // Following a link closes the mobile menu. Dropdown chevrons keep it open.
   nav?.addEventListener('click', (e) => {
-    if ((e.target as HTMLElement).tagName === 'A') {
+    if ((e.target as HTMLElement).closest('a')) {
       nav.classList.remove('open');
-      toggle?.setAttribute('aria-expanded', 'false');
+      menuToggle?.setAttribute('aria-expanded', 'false');
+      closeAll();
     }
   });
 </script>

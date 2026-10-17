@@ -5,7 +5,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { site } from '../data/site';
-import { towns } from '../data/towns';
+import { towns, type Town } from '../data/towns';
 import { u } from '../lib/url';
 
 interface Props {
@@ -15,19 +15,21 @@ interface Props {
   path?: string;
   /** Extra JSON-LD objects (FAQ, breadcrumbs, ...). */
   jsonLd?: object[];
+  /** Set on location pages. Brands the header and structured data as "Thuro Pest Control in {town}". */
+  town?: Town;
 }
 
-const { title, description, path = '', jsonLd = [] } = Astro.props;
+const { title, description, path = '', jsonLd = [], town } = Astro.props;
 const canonical = new URL(u(path), site.url).href;
 
 const business = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
-  name: site.name,
-  url: new URL(u(), site.url).href,
+  name: town ? `${site.name} in ${town.name}` : site.name,
+  url: new URL(u(path), site.url).href,
   telephone: '+1-978-608-3019',
   description: 'Residential pest control, quarterly protection plans, and one-time treatments.',
-  areaServed: towns.map((t) => ({ '@type': 'City', name: `${t.name}, SC` })),
+  areaServed: (town ? [town] : towns).map((t) => ({ '@type': 'City', name: `${t.name}, SC` })),
   parentOrganization: { '@type': 'Organization', name: site.parent, url: site.mainSite },
   address: { '@type': 'PostalAddress', addressLocality: 'Conway', addressRegion: 'SC', postalCode: '29526', addressCountry: 'US' },
 };
@@ -56,7 +58,7 @@ const business = {
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    <Header />
+    <Header town={town} />
     <main id="main">
       <slot />
     </main>
