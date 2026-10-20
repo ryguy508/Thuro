@@ -466,14 +466,3 @@ ul { margin: 0; padding: 0; list-style: none; }
 
 .nav-call { display: none; }
 @media (max-width: 959px) { .nav.open .nav-call { display: inline-flex; margin-top: 16px; } }
-
-/* Nearby towns: four across on desktop, two by two on phones */
-.area-grid-near { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-@media (min-width: 860px) { .area-grid-near { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-.area-near { padding: 16px; }
-.area-near .area-name { flex: 1; }
-.area-dist { font-size: 0.74rem; font-weight: 700; color: var(--muted); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
-@media (max-width: 559px) {
-  .area-near { flex-direction: column; align-items: flex-start; gap: 6px; }
-  .area-near > svg { display: none; }
-}

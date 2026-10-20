@@ -6,7 +6,6 @@ import Steps from '../../components/Steps.astro';
 import { towns } from '../../data/towns';
 import { pests } from '../../data/pests';
 import { site } from '../../data/site';
-import { nearest } from '../../../shared/geo.ts';
 import { u } from '../../lib/url';
 
 export function getStaticPaths() {
@@ -14,8 +13,6 @@ export function getStaticPaths() {
 }
 
 const { town } = Astro.props;
-// The four closest towns by distance, so each page links to its real neighbors.
-const nearby = nearest(town, towns, 4);
 
 const breadcrumbLd = {
   '@context': 'https://schema.org',
@@ -80,24 +77,6 @@ const breadcrumbLd = {
         <h2>What to expect from Thuro</h2>
       </div>
       <Steps />
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container">
-      <div class="section-head">
-        <h2>We also serve nearby</h2>
-        <p class="lede">The closest towns to {town.name} that Thuro Pest Control protects.</p>
-      </div>
-      <div class="area-grid area-grid-near">
-        {nearby.map(({ place, miles }) => (
-          <a class="area area-near" href={u(`locations/${place.slug}/`)}>
-            <Icon name="map-pin" size={18} />
-            <span class="area-name">{place.name}</span>
-            <span class="area-dist">{Math.max(1, Math.round(miles))} mi</span>
-          </a>
-        ))}
-      </div>
     </div>
   </section>
 </Base>
