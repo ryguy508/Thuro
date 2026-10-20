@@ -4,6 +4,7 @@ import Icon from '../../components/Icon.astro';
 import EstimateCard from '../../components/EstimateCard.astro';
 import Steps from '../../components/Steps.astro';
 import { towns } from '../../data/towns';
+import { faqsFor } from '../../data/town-faqs';
 import { pests } from '../../data/pests';
 import { site } from '../../data/site';
 import { u } from '../../lib/url';
@@ -13,6 +14,13 @@ export function getStaticPaths() {
 }
 
 const { town } = Astro.props;
+
+const faqs = faqsFor(town);
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
 
 const breadcrumbLd = {
   '@context': 'https://schema.org',
@@ -28,7 +36,7 @@ const breadcrumbLd = {
   title={`Professional Pest Control in ${town.name}, SC | Thuro Pest Control`}
   description={`Thuro Pest Control protects ${town.name}, SC homes with quarterly plans and one-time treatments. Family- and pet-friendly, licensed and insured. Free estimates.`}
   path={`locations/${town.slug}/`}
-  jsonLd={[breadcrumbLd]}
+  jsonLd={[breadcrumbLd, faqLd]}
   town={town}
 >
   <section class="hero hero-sm">
@@ -77,6 +85,50 @@ const breadcrumbLd = {
         <h2>What to expect from Thuro</h2>
       </div>
       <Steps />
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{town.name} FAQ</span>
+        <h2>Pest control questions in {town.name}, answered</h2>
+      </div>
+      <div class="faq">
+        {faqs.map((f) => (
+          <details>
+            <summary>{f.q} <Icon name="chevron-down" size={20} /></summary>
+            <p>
+              {f.a}
+              {f.pest && (
+                <>
+                  {' '}
+                  <a class="faq-link" href={u(`pests/${f.pest}/`)}>
+                    Learn about {pests.find((p) => p.slug === f.pest)?.controlName.toLowerCase()} <Icon name="arrow-right" size={14} />
+                  </a>
+                </>
+              )}
+            </p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-dark cta-band">
+    <div class="container">
+      <span class="eyebrow">Thuro Pest Control in {town.name}</span>
+      <h2>Get your free pest control estimate in {town.name}</h2>
+      <p class="lede">Tell us what you are seeing and we will recommend the right treatment. No obligation.</p>
+      <ul class="cta-points">
+        <li><Icon name="check" size={18} /> Licensed &amp; insured in SC</li>
+        <li><Icon name="check" size={18} /> Free re-treatment between visits</li>
+        <li><Icon name="check" size={18} /> Family- and pet-friendly treatments</li>
+      </ul>
+      <div class="cta-actions">
+        <a class="btn btn-gold" href="#estimate">Get My Free Estimate</a>
+        <a class="btn btn-outline" href={site.phoneHref}><Icon name="phone" size={18} /> {site.phone}</a>
+      </div>
     </div>
   </section>
 </Base>
