@@ -18,6 +18,11 @@ import search from 'lucide-static/icons/search.svg?raw';
 import shieldCheck from 'lucide-static/icons/shield-check.svg?raw';
 import sprayCan from 'lucide-static/icons/spray-can.svg?raw';
 import worm from 'lucide-static/icons/worm.svg?raw';
+// Hand-drawn in the same stroke style, because the icon set has no ant, roach, spider, or wasp.
+import ant from '../icons/ant.svg?raw';
+import roach from '../icons/roach.svg?raw';
+import spider from '../icons/spider.svg?raw';
+import wasp from '../icons/wasp.svg?raw';
 
 const icons: Record<string, string> = {
   'arrow-right': arrowRight,
@@ -39,6 +44,10 @@ const icons: Record<string, string> = {
   'shield-check': shieldCheck,
   'spray-can': sprayCan,
   worm,
+  ant,
+  roach,
+  spider,
+  wasp,
 };
 
 const { name, size = 24 } = Astro.props;

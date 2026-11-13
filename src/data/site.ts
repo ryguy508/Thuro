@@ -5,6 +5,7 @@ export const site = {
   mainSite: 'https://thuroexteriors.com',
   phone: '(978) 608-3019',
   phoneHref: 'tel:+19786083019',
+  phoneE164: '+1-978-608-3019',
   region: 'Myrtle Beach & Horry County, SC',
   // Add the SC structural pest control license number once available; it renders in the footer.
   licenseNumber: '',

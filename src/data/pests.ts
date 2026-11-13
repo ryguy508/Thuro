@@ -20,7 +20,7 @@ export const pests: Pest[] = [
     slug: 'ants',
     name: 'Ants',
     controlName: 'Ant Control',
-    icon: 'bug',
+    icon: 'ant',
     short: 'Fire ants, carpenter ants, and the sugar ants that march into kitchens.',
     inPlan: true,
     intro:
@@ -45,7 +45,7 @@ export const pests: Pest[] = [
     slug: 'cockroaches',
     name: 'Roaches & Palmetto Bugs',
     controlName: 'Roach & Palmetto Bug Control',
-    icon: 'bug',
+    icon: 'roach',
     short: 'Palmetto bugs and household roaches that hide in warm, damp spots.',
     inPlan: true,
     intro:
@@ -70,7 +70,7 @@ export const pests: Pest[] = [
     slug: 'spiders',
     name: 'Spiders',
     controlName: 'Spider Control',
-    icon: 'bug',
+    icon: 'spider',
     short: 'Webs, egg sacs, and the occasional black widow or brown recluse.',
     inPlan: true,
     intro:
@@ -95,7 +95,7 @@ export const pests: Pest[] = [
     slug: 'wasps-hornets',
     name: 'Wasps & Hornets',
     controlName: 'Wasp & Hornet Control',
-    icon: 'bug',
+    icon: 'wasp',
     short: 'Paper wasps, yellow jackets, and hornets nesting on your home.',
     inPlan: true,
     intro:

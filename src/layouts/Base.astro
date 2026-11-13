@@ -7,6 +7,10 @@ import Footer from '../components/Footer.astro';
 import { site } from '../data/site';
 import { towns, type Town } from '../data/towns';
 import { u } from '../lib/url';
+import Icon from '../components/Icon.astro';
+// The two fonts every page uses above the fold; preloading them avoids a flash of fallback text.
+import montserratLatin from '@fontsource-variable/montserrat/files/montserrat-latin-wght-normal.woff2?url';
+import playfairLatin from '@fontsource-variable/playfair-display/files/playfair-display-latin-wght-normal.woff2?url';
 
 interface Props {
   title: string;
@@ -17,9 +21,11 @@ interface Props {
   jsonLd?: object[];
   /** Set on location pages. Brands the header and structured data as "Thuro Pest Control in {town}". */
   town?: Town;
+  /** Keeps utility pages such as the 404 out of search results. */
+  noindex?: boolean;
 }
 
-const { title, description, path = '', jsonLd = [], town } = Astro.props;
+const { title, description, path = '', jsonLd = [], town, noindex = false } = Astro.props;
 const canonical = new URL(u(path), site.url).href;
 
 const business = {
@@ -27,7 +33,7 @@ const business = {
   '@type': 'LocalBusiness',
   name: town ? `${site.name} in ${town.name}` : site.name,
   url: new URL(u(path), site.url).href,
-  telephone: '+1-978-608-3019',
+  telephone: site.phoneE164,
   description: 'Residential pest control, quarterly protection plans, and one-time treatments.',
   areaServed: (town ? [town] : towns).map((t) => ({ '@type': 'City', name: `${t.name}, SC` })),
   parentOrganization: { '@type': 'Organization', name: site.parent, url: site.mainSite },
@@ -42,8 +48,10 @@ const business = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <meta name="theme-color" content="#101010" />
+    <link rel="preload" as="font" type="font/woff2" href={montserratLatin} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={playfairLatin} crossorigin />
     <link rel="icon" type="image/svg+xml" href={u('favicon.svg')} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
@@ -63,5 +71,19 @@ const business = {
       <slot />
     </main>
     <Footer />
+    {/* Phones only: keeps the two main actions one tap away while scrolling. */}
+    <div class="sticky-cta" data-sticky-cta hidden>
+      <a class="btn btn-outline" href={site.phoneHref}><Icon name="phone" size={18} /> Call</a>
+      <a class="btn btn-gold" href="#estimate">Free Estimate</a>
+    </div>
+    <script>
+      const bar = document.querySelector<HTMLElement>('[data-sticky-cta]');
+      const card = document.getElementById('estimate');
+      if (bar && card) {
+        bar.hidden = false;
+        // Hidden while the estimate card is on screen, so it never covers the form.
+        new IntersectionObserver(([entry]) => bar.classList.toggle('is-visible', !entry.isIntersecting)).observe(card);
+      }
+    </script>
   </body>
 </html>

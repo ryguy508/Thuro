@@ -37,6 +37,13 @@ The Cloudflare Workers project `thuro` builds the `claude/affectionate-brown-ej6
 `npm run build` and `npx wrangler deploy` (see `wrangler.jsonc`). The build writes to `dist/pest-control/`,
 so the preview is served at `<project>.workers.dev/pest-control/`. Every push to the branch redeploys.
 
+## Caching, headers, and the 404 page
+
+`scripts/postbuild.mjs` writes `dist/_headers`: fingerprinted files under `_astro/` are cached for a year,
+every response gets basic security headers, and the `*.workers.dev` preview address is marked `noindex` so
+only thuroexteriors.com/pest-control is indexed. Unknown URLs show `src/pages/404.astro`
+(`not_found_handling` in `wrangler.jsonc`).
+
 ## Leads and GoHighLevel
 
 The estimate flow posts to a Cloudflare Worker route (`/pest-control/api/lead`, code in `worker/`), which

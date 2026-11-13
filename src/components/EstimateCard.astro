@@ -50,6 +50,7 @@ const payEnabled = Boolean(site.checkoutUrl);
   data-zips={JSON.stringify(serviceAreaZips)}
   data-endpoint={endpoint}
   data-checkout={site.checkoutUrl}
+  data-phone={site.phone}
   data-pest={pest}
 >
   <h2 class="estimate-title">{heading}</h2>
@@ -232,7 +233,6 @@ const payEnabled = Boolean(site.checkoutUrl);
   type Step = 'zip' | 'pests' | 'details' | 'plan' | 'contact' | 'next' | 'done';
   const PROGRESS: Step[] = ['zip', 'pests', 'details', 'plan', 'contact'];
   const LABELS = ['Location', 'Problem', 'Details', 'Your plan', 'Contact'];
-  const PHONE = '(978) 608-3019';
 
   /** Marketing attribution (UTM tags, ad click ids) carried through to the lead record. */
   function attribution() {
@@ -249,6 +249,7 @@ const payEnabled = Boolean(site.checkoutUrl);
     const zips: Record<string, string> = JSON.parse(root.dataset.zips ?? '{}');
     const endpoint = root.dataset.endpoint ?? '';
     const checkoutUrl = root.dataset.checkout ?? '';
+    const PHONE = root.dataset.phone ?? '';
 
     const steps = new Map<Step, HTMLElement>();
     root.querySelectorAll<HTMLElement>('[data-step]').forEach((el) => steps.set(el.dataset.step as Step, el));

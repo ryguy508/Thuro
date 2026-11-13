@@ -1,0 +1,34 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+import { pests } from '../data/pests';
+import { u } from '../lib/url';
+---
+
+<Base title="Page Not Found | Thuro Pest Control" description="That page could not be found. Head back to Thuro Pest Control to get a free estimate." path="404/" noindex>
+  <section class="hero hero-sm">
+    <div class="container">
+      <span class="eyebrow">Error 404</span>
+      <h1>This page has been <em>exterminated.</em></h1>
+      <p class="lede">We could not find the page you were looking for. Here is where to go next.</p>
+      <div class="hero-cta" style="margin-top: 26px;">
+        <a class="btn btn-gold" href={u('#estimate')}>Get a Free Estimate</a>
+        <a class="btn btn-outline" href={site.phoneHref}><Icon name="phone" size={18} /> Call {site.phone}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Pests We Control</span>
+        <h2>Looking for one of these?</h2>
+      </div>
+      <div class="addon-links" style="justify-content: center;">
+        <a class="pill" href={u()}>Home</a>
+        {pests.map((p) => <a class="pill" href={u(`pests/${p.slug}/`)}>{p.controlName}</a>)}
+      </div>
+    </div>
+  </section>
+</Base>

@@ -472,3 +472,18 @@ ul { margin: 0; padding: 0; list-style: none; }
 .cta-points { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; margin: 0 0 28px; font-size: 0.92rem; font-weight: 600; color: #e8e8e2; }
 .cta-points li { display: flex; align-items: center; gap: 8px; }
 .cta-points svg { color: var(--gold); }
+
+.footer-about a { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Sticky call / estimate bar (phones only) */
+.sticky-cta { display: none; }
+@media (max-width: 719px) {
+  .sticky-cta {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 45; display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px;
+    padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom)); background: rgba(16, 16, 16, 0.96); backdrop-filter: blur(8px);
+    border-top: 1px solid #2a2a2a; transform: translateY(110%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .sticky-cta.is-visible { transform: none; }
+  .sticky-cta .btn { padding: 12px 10px; }
+  .site-footer { padding-bottom: 76px; }
+}

@@ -11,5 +11,7 @@ export default defineConfig({
   // it will have on thuroexteriors.com.
   outDir: './dist/pest-control',
   build: { format: 'directory' },
+  // Starts loading a page when a link is hovered or touched, so navigation feels instant.
+  prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   integrations: [sitemap()],
 });
